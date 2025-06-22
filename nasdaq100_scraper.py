@@ -7,6 +7,7 @@ import logging
 from typing import Optional, List, Dict
 import re
 import os
+from fake_useragent import UserAgent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -51,8 +52,9 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
+    ua = UserAgent()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': ua.random
     }
     
     try:
@@ -108,8 +110,9 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
+    ua = UserAgent()
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': ua.random
     }
     
     try:
