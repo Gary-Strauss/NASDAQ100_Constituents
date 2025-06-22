@@ -76,15 +76,51 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
                 if ticker_col is not None and company_col is not None:
                     # Table found, standardize column names
                     df = table.copy()
-                    df = df.rename(columns={
-                        columns[ticker_col]: 'Ticker',
-                        columns[company_col]: 'Company',
-                        columns[sector_col] if sector_col is not None else columns[2]: 'GICS_Sector',
-                        columns[subsector_col] if subsector_col is not None else columns[3]: 'GICS_Sub_Industry'
-                    })
                     
-                    # Keep only the desired columns
-                    df = df[['Ticker', 'Company', 'GICS_Sector', 'GICS_Sub_Industry']]
+                    # Safe fallback for sector column
+                    sector_fallback = None
+                    if sector_col is None and len(columns) > 2:
+                        sector_fallback = columns[2]
+                    
+                    # Safe fallback for subsector column  
+                    subsector_fallback = None
+                    if subsector_col is None and len(columns) > 3:
+                        subsector_fallback = columns[3]
+                    
+                    rename_dict = {
+                        columns[ticker_col]: 'Ticker',
+                        columns[company_col]: 'Company'
+                    }
+                    
+                    # Add sector column if available
+                    if sector_col is not None:
+                        rename_dict[columns[sector_col]] = 'GICS_Sector'
+                    elif sector_fallback is not None:
+                        rename_dict[sector_fallback] = 'GICS_Sector'
+                    
+                    # Add subsector column if available
+                    if subsector_col is not None:
+                        rename_dict[columns[subsector_col]] = 'GICS_Sub_Industry'
+                    elif subsector_fallback is not None:
+                        rename_dict[subsector_fallback] = 'GICS_Sub_Industry'
+                    
+                    df = df.rename(columns=rename_dict)
+                    
+                    # Keep only the desired columns that exist
+                    available_columns = ['Ticker', 'Company']
+                    if 'GICS_Sector' in df.columns:
+                        available_columns.append('GICS_Sector')
+                    else:
+                        df['GICS_Sector'] = ''  # Add empty column if missing
+                        available_columns.append('GICS_Sector')
+                    
+                    if 'GICS_Sub_Industry' in df.columns:
+                        available_columns.append('GICS_Sub_Industry')
+                    else:
+                        df['GICS_Sub_Industry'] = ''  # Add empty column if missing
+                        available_columns.append('GICS_Sub_Industry')
+                    
+                    df = df[available_columns]
                     
                     # Clean data
                     df = clean_dataframe(df)
