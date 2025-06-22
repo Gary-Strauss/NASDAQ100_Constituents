@@ -50,6 +50,11 @@ jobs:
         git commit -m "chore: Update NASDAQ-100 data $(date +'%Y-%m-%d')"
         git push
         
+    - name: Get current timestamp
+      if: steps.verify-changed-files.outputs.changed == 'true'
+      id: timestamp
+      run: echo "datetime=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+        
     - name: Create Release
       if: steps.verify-changed-files.outputs.changed == 'true'
       uses: actions/create-release@v1
@@ -65,6 +70,6 @@ jobs:
           - CSV: [nasdaq100_constituents.csv](https://raw.githubusercontent.com/${{ github.repository }}/main/data/nasdaq100_constituents.csv)
           - JSON: [nasdaq100_constituents.json](https://raw.githubusercontent.com/${{ github.repository }}/main/data/nasdaq100_constituents.json)
           
-          🤖 Automatically generated on $(date +'%Y-%m-%d %H:%M:%S') UTC
+          🤖 Automatically generated on ${{ steps.timestamp.outputs.datetime }} UTC
         draft: false
         prerelease: false
