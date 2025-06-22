@@ -26,7 +26,7 @@ The goal is to provide a reliable, automated way to access this financial data t
 1. Clone the repository:
 ```bash
 git clone https://github.com/Gary-Strauss/NASDAQ100_Constituents
-cd nasdaq100-scraper
+cd NASDAQ100_Constituents
 ```
 
 2. Install dependencies:
