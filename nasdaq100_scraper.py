@@ -100,6 +100,159 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
         logger.error(f"Error with pandas.read_html(): {e}")
         return None
 
+def _fetch_page_content(url: str) -> BeautifulSoup:
+    """
+    Fetch and parse the Wikipedia page content.
+    
+    Args:
+        url: Wikipedia URL
+        
+    Returns:
+        BeautifulSoup object with parsed HTML
+        
+    Raises:
+        Exception: If page cannot be fetched or parsed
+    """
+    ua = UserAgent()
+    headers = {
+        'User-Agent': ua.random
+    }
+    
+    response = requests.get(url, headers=headers, timeout=30)
+    response.raise_for_status()
+    
+    return BeautifulSoup(response.content, 'html.parser')
+
+def _locate_components_table(soup: BeautifulSoup) -> Optional[object]:
+    """
+    Locate the NASDAQ-100 components table using multiple strategies.
+    
+    Args:
+        soup: BeautifulSoup object with parsed HTML
+        
+    Returns:
+        Table element or None if not found
+    """
+    # Strategy 1: Search for "Components" heading
+    components_heading = soup.find(['h2', 'h3'], string=re.compile(r'Components', re.IGNORECASE))
+    if components_heading:
+        table = components_heading.find_next('table', class_='wikitable')
+        if table:
+            return table
+    
+    # Strategy 2: Search for table with "Ticker" in the first row
+    tables = soup.find_all('table', class_='wikitable')
+    for table in tables:
+        first_row = table.find('tr')
+        if first_row and 'ticker' in first_row.get_text().lower():
+            return table
+    
+    # Strategy 3: Largest table with at least 4 columns and sufficient rows
+    largest_table = None
+    max_rows = 0
+    
+    for table in tables:
+        rows = table.find_all('tr')
+        if len(rows) > max_rows and len(rows) > 50:  # At least 50 rows for Nasdaq-100
+            first_row = rows[0] if rows else None
+            if first_row and len(first_row.find_all(['th', 'td'])) >= 4:
+                largest_table = table
+                max_rows = len(rows)
+    
+    return largest_table
+
+def _parse_header_row(table: object) -> tuple:
+    """
+    Parse the header row and determine column indices.
+    
+    Args:
+        table: Table element
+        
+    Returns:
+        Tuple of (header_row, ticker_idx, company_idx, sector_idx, subsector_idx)
+    """
+    rows = table.find_all('tr')
+    
+    # Find header row
+    header_row = None
+    for row in rows:
+        cells = row.find_all(['th', 'td'])
+        if len(cells) >= 4:
+            header_text = [cell.get_text().strip().lower() for cell in cells]
+            if any('ticker' in text or 'symbol' in text for text in header_text):
+                header_row = row
+                break
+    
+    if not header_row:
+        header_row = rows[0]  # Fallback to first row
+    
+    # Determine column indices
+    header_cells = header_row.find_all(['th', 'td'])
+    header_texts = [cell.get_text().strip() for cell in header_cells]
+    
+    ticker_idx = find_column_by_keywords(header_texts, ['ticker', 'symbol'])
+    company_idx = find_column_by_keywords(header_texts, ['company', 'name'])
+    sector_idx = find_column_by_keywords(header_texts, ['sector', 'gics sector'])
+    subsector_idx = find_column_by_keywords(header_texts, ['sub-industry', 'gics sub', 'sub industry'])
+    
+    # Fallback indices if not found
+    if ticker_idx is None: ticker_idx = 0
+    if company_idx is None: company_idx = 1
+    if sector_idx is None: sector_idx = 2
+    if subsector_idx is None: subsector_idx = 3
+    
+    return header_row, ticker_idx, company_idx, sector_idx, subsector_idx
+
+def _extract_table_data(table: object, header_row: object, ticker_idx: int, 
+                       company_idx: int, sector_idx: int, subsector_idx: int) -> List[Dict]:
+    """
+    Extract data from table rows.
+    
+    Args:
+        table: Table element
+        header_row: Header row element
+        ticker_idx: Index of ticker column
+        company_idx: Index of company column
+        sector_idx: Index of sector column
+        subsector_idx: Index of subsector column
+        
+    Returns:
+        List of dictionaries with extracted data
+    """
+    data = []
+    rows = table.find_all('tr')
+    
+    # Find the index of header row to skip it
+    header_index = 0
+    for i, row in enumerate(rows):
+        if row == header_row:
+            header_index = i
+            break
+    
+    # Parse data rows (skip header)
+    for row in rows[header_index + 1:]:
+        cells = row.find_all(['td', 'th'])
+        if len(cells) >= 4:
+            try:
+                ticker = clean_text(cells[ticker_idx].get_text())
+                company = clean_text(cells[company_idx].get_text())
+                sector = clean_text(cells[sector_idx].get_text()) if sector_idx < len(cells) else ""
+                subsector = clean_text(cells[subsector_idx].get_text()) if subsector_idx < len(cells) else ""
+                
+                # Validate ticker (should be 1-5 letters)
+                if ticker and re.match(r'^[A-Z]{1,5}$', ticker):
+                    data.append({
+                        'Ticker': ticker,
+                        'Company': company,
+                        'GICS_Sector': sector,
+                        'GICS_Sub_Industry': subsector
+                    })
+            except (IndexError, AttributeError) as e:
+                logger.debug(f"Error parsing row: {e}")
+                continue
+    
+    return data
+
 def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
     """
     Backup method with BeautifulSoup for more control over HTML parsing.
@@ -110,114 +263,27 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
-    ua = UserAgent()
-    headers = {
-        'User-Agent': ua.random
-    }
-    
     try:
-        response = requests.get(url, headers=headers, timeout=30)
-        response.raise_for_status()
+        # Fetch and parse page content
+        soup = _fetch_page_content(url)
         
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Search for the Components table
-        # Different strategies for table finding
-        table = None
-        
-        # Strategy 1: Search for "Components" heading
-        components_heading = soup.find(['h2', 'h3'], string=re.compile(r'Components', re.IGNORECASE))
-        if components_heading:
-            # Find the next table after the heading
-            table = components_heading.find_next('table', class_='wikitable')
-        
-        # Strategy 2: Search for table with "Ticker" in the first row
-        if not table:
-            tables = soup.find_all('table', class_='wikitable')
-            for t in tables:
-                first_row = t.find('tr')
-                if first_row and 'ticker' in first_row.get_text().lower():
-                    table = t
-                    break
-        
-        # Strategy 3: Largest table with at least 4 columns
-        if not table:
-            tables = soup.find_all('table', class_='wikitable')
-            largest_table = None
-            max_rows = 0
-            
-            for t in tables:
-                rows = t.find_all('tr')
-                if len(rows) > max_rows and len(rows) > 50:  # At least 50 rows for Nasdaq-100
-                    first_row = rows[0] if rows else None
-                    if first_row and len(first_row.find_all(['th', 'td'])) >= 4:
-                        largest_table = t
-                        max_rows = len(rows)
-            
-            table = largest_table
-        
+        # Locate the components table
+        table = _locate_components_table(soup)
         if not table:
             logger.error("No suitable table found with BeautifulSoup")
             return None
         
-        # Parse table
-        data = []
-        rows = table.find_all('tr')
+        # Parse header row and determine column indices
+        header_row, ticker_idx, company_idx, sector_idx, subsector_idx = _parse_header_row(table)
         
-        # Find header row
-        header_row = None
-        for row in rows:
-            cells = row.find_all(['th', 'td'])
-            if len(cells) >= 4:
-                header_text = [cell.get_text().strip().lower() for cell in cells]
-                if any('ticker' in text or 'symbol' in text for text in header_text):
-                    header_row = row
-                    break
-        
-        if not header_row:
-            header_row = rows[0]  # Fallback to first row
-        
-        # Determine column indices
-        header_cells = header_row.find_all(['th', 'td'])
-        header_texts = [cell.get_text().strip() for cell in header_cells]
-        
-        ticker_idx = find_column_by_keywords(header_texts, ['ticker', 'symbol'])
-        company_idx = find_column_by_keywords(header_texts, ['company', 'name'])
-        sector_idx = find_column_by_keywords(header_texts, ['sector', 'gics sector'])
-        subsector_idx = find_column_by_keywords(header_texts, ['sub-industry', 'gics sub', 'sub industry'])
-        
-        # Fallback indices if not found
-        if ticker_idx is None: ticker_idx = 0
-        if company_idx is None: company_idx = 1
-        if sector_idx is None: sector_idx = 2
-        if subsector_idx is None: subsector_idx = 3
-        
-        # Parse data rows
-        for row in rows[1:]:  # Skip header
-            cells = row.find_all(['td', 'th'])
-            if len(cells) >= 4:
-                try:
-                    ticker = clean_text(cells[ticker_idx].get_text())
-                    company = clean_text(cells[company_idx].get_text())
-                    sector = clean_text(cells[sector_idx].get_text()) if sector_idx < len(cells) else ""
-                    subsector = clean_text(cells[subsector_idx].get_text()) if subsector_idx < len(cells) else ""
-                    
-                    # Validate ticker (should be 1-5 letters)
-                    if ticker and re.match(r'^[A-Z]{1,5}$', ticker):
-                        data.append({
-                            'Ticker': ticker,
-                            'Company': company,
-                            'GICS_Sector': sector,
-                            'GICS_Sub_Industry': subsector
-                        })
-                except (IndexError, AttributeError) as e:
-                    logger.debug(f"Error parsing row: {e}")
-                    continue
+        # Extract data from table rows
+        data = _extract_table_data(table, header_row, ticker_idx, company_idx, sector_idx, subsector_idx)
         
         if not data:
             logger.error("No valid data extracted with BeautifulSoup")
             return None
         
+        # Create and clean DataFrame
         df = pd.DataFrame(data)
         df = clean_dataframe(df)
         
