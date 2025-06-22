@@ -25,7 +25,7 @@ The goal is to provide a reliable, automated way to access this financial data t
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/Gary-Strauss/NASDAQ100_Constituents
 cd nasdaq100-scraper
 ```
 
@@ -34,7 +34,7 @@ cd nasdaq100-scraper
 pip install -r requirements.txt
 ```
 
-## Usage
+## Usageo
 
 ### Local Usage
 
