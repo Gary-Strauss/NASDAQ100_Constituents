@@ -13,6 +13,9 @@ from fake_useragent import UserAgent
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# User-Agent generator for consistent usage across functions
+USER_AGENT = UserAgent()
+
 def get_nasdaq100_components() -> pd.DataFrame:
     """
     Main function to retrieve Nasdaq-100 components from Wikipedia.
@@ -52,9 +55,8 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
-    ua = UserAgent()
     headers = {
-        'User-Agent': ua.random
+        'User-Agent': USER_AGENT.random
     }
     
     try:
@@ -149,9 +151,8 @@ def _fetch_page_content(url: str) -> BeautifulSoup:
     Raises:
         Exception: If page cannot be fetched or parsed
     """
-    ua = UserAgent()
     headers = {
-        'User-Agent': ua.random
+        'User-Agent': USER_AGENT.random
     }
     
     response = requests.get(url, headers=headers, timeout=30)
