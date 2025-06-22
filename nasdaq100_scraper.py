@@ -350,7 +350,7 @@ def get_nasdaq100_with_retry(max_retries: int = 3) -> pd.DataFrame:
         except Exception as e:
             logger.error(f"Attempt {attempt + 1} failed: {e}")
             if attempt == max_retries - 1:
-                raise Exception(f"All {max_retries} attempts failed")
+                raise Exception(f"All {max_retries} attempts failed") from e
     
     raise Exception("Unexpected error in retry logic")
 
