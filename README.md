@@ -1,3 +1,5 @@
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Gary-Strauss/NASDAQ100_Constituents?utm_source=oss&utm_medium=github&utm_campaign=Gary-Strauss%2FNASDAQ100_Constituents&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
+
 # NASDAQ-100 Scraper
 
 A Python tool for retrieving and storing current NASDAQ-100 constituents from Wikipedia.
