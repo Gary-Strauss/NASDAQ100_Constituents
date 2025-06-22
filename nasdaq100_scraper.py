@@ -271,10 +271,23 @@ def _extract_table_data(table: object, header_row: object, ticker_idx: int,
         cells = row.find_all(['td', 'th'])
         if len(cells) >= 4:
             try:
-                ticker = clean_text(cells[ticker_idx].get_text())
-                company = clean_text(cells[company_idx].get_text())
-                sector = clean_text(cells[sector_idx].get_text()) if sector_idx < len(cells) else ""
-                subsector = clean_text(cells[subsector_idx].get_text()) if subsector_idx < len(cells) else ""
+                # Safe bounds checking for all indices
+                ticker = ""
+                company = ""
+                sector = ""
+                subsector = ""
+                
+                if 0 <= ticker_idx < len(cells):
+                    ticker = clean_text(cells[ticker_idx].get_text())
+                
+                if 0 <= company_idx < len(cells):
+                    company = clean_text(cells[company_idx].get_text())
+                
+                if 0 <= sector_idx < len(cells):
+                    sector = clean_text(cells[sector_idx].get_text())
+                
+                if 0 <= subsector_idx < len(cells):
+                    subsector = clean_text(cells[subsector_idx].get_text())
                 
                 # Validate ticker (should be 1-5 letters)
                 if ticker and re.match(r'^[A-Z]{1,5}$', ticker):
