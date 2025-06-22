@@ -1,120 +1,127 @@
 # NASDAQ-100 Scraper
 
-Ein Python-Tool zum Abrufen und Speichern der aktuellen NASDAQ-100 Bestandteile von Wikipedia.
+A Python tool for retrieving and storing current NASDAQ-100 constituents from Wikipedia.
 
-## Beschreibung
+## Description
 
-Dieses Projekt scrapt die Liste der NASDAQ-100 Unternehmen von der Wikipedia-Seite und speichert die Daten in CSV- und JSON-Formaten. Das Tool verwendet mehrere Fallback-Strategien, um eine zuverlässige Datenextraktion zu gewährleisten.
+This project scrapes the list of NASDAQ-100 companies from the Wikipedia page and saves the data in CSV and JSON formats. The tool uses multiple fallback strategies to ensure reliable data extraction.
 
 ## Features
 
-- **Mehrfache Extraktionsmethoden**: Verwendet sowohl `pandas.read_html()` als auch `BeautifulSoup` als Fallback
-- **Robuste Fehlerbehandlung**: Automatische Wiederholungsversuche bei Fehlern
-- **Datenvalidierung**: Überprüft die Vollständigkeit und Korrektheit der extrahierten Daten
-- **Mehrere Ausgabeformate**: Speichert Daten sowohl als CSV als auch als JSON
-- **Logging**: Detaillierte Protokollierung aller Vorgänge
-- **Datenbereinigung**: Automatische Bereinigung von Whitespace und Formatierung
+- **Multiple extraction methods**: Uses both `pandas.read_html()` and `BeautifulSoup` as fallback
+- **Robust error handling**: Automatic retry attempts on failures
+- **Data validation**: Checks completeness and correctness of extracted data
+- **Multiple output formats**: Saves data as both CSV and JSON
+- **Logging**: Detailed logging of all operations
+- **Data cleaning**: Automatic cleaning of whitespace and formatting
 
 ## Installation
 
-1. Repository klonen:
+1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd nasdaq100-scraper
 ```
 
-2. Abhängigkeiten installieren:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Verwendung
+## Usage
 
-Das Skript direkt ausführen:
+Run the script directly:
 
 ```bash
 python nasdaq100_scraper.py
 ```
 
-Das Tool wird automatisch:
-1. Die NASDAQ-100 Daten von Wikipedia abrufen
-2. Die Daten validieren und bereinigen
-3. Die Ergebnisse in `data/nasdaq100_constituents.csv` und `data/nasdaq100_constituents.json` speichern
-4. Eine Zusammenfassung der ersten 5 Einträge anzeigen
+The tool will automatically:
+1. Retrieve NASDAQ-100 data from Wikipedia
+2. Validate and clean the data
+3. Save results to `data/nasdaq100_constituents.csv` and `data/nasdaq100_constituents.json`
+4. Display a summary of the first 5 entries
 
-## Ausgabedateien
+## Output Files
 
-- **CSV-Format** (`data/nasdaq100_constituents.csv`): Tabellarische Darstellung für Excel/Spreadsheet-Programme
-- **JSON-Format** (`data/nasdaq100_constituents.json`): Strukturierte Daten für programmatische Verwendung
+- **CSV format** (`data/nasdaq100_constituents.csv`): Tabular representation for Excel/spreadsheet programs
+- **JSON format** (`data/nasdaq100_constituents.json`): Structured data for programmatic use
 
-## Datenstruktur
+## Data Structure
 
-Die extrahierten Daten enthalten folgende Spalten:
-- **Ticker**: Börsensymbol des Unternehmens
-- **Company**: Vollständiger Firmenname
-- **GICS_Sector**: Global Industry Classification Standard Sektor
-- **GICS_Sub_Industry**: GICS Unterbranche
+The extracted data contains the following columns:
+- **Ticker**: Company stock symbol
+- **Company**: Full company name
+- **GICS_Sector**: Global Industry Classification Standard sector
+- **GICS_Sub_Industry**: GICS sub-industry
 
-## Beispieldaten
+## Sample Data
 
-Das Tool extrahiert derzeit 101 Unternehmen, darunter:
+The tool currently extracts 101 companies, including:
 - Apple Inc. (AAPL) - Information Technology
 - Microsoft (MSFT) - Information Technology
 - Amazon (AMZN) - Consumer Discretionary
 - Nvidia (NVDA) - Information Technology
 - Meta Platforms (META) - Communication Services
 
-## Technische Details
+## Technical Details
 
-### Extraktionsmethoden
+### Extraction Methods
 
-1. **Pandas-Methode**: Versucht zuerst `pandas.read_html()` für schnelle Tabellenextraktion
-2. **BeautifulSoup-Fallback**: Bei Fehlern der Pandas-Methode wird BeautifulSoup verwendet
-3. **Intelligente Spaltenerkennung**: Automatische Identifikation der relevanten Tabellenspalten
-4. **Retry-Mechanismus**: Bis zu 3 Wiederholungsversuche bei Netzwerkfehlern
+1. **Pandas method**: First attempts `pandas.read_html()` for fast table extraction
+2. **BeautifulSoup fallback**: Uses BeautifulSoup when pandas method fails
+3. **Intelligent column detection**: Automatic identification of relevant table columns
+4. **Retry mechanism**: Up to 3 retry attempts on network errors
 
-### Datenvalidierung
+### Data Validation
 
-- Überprüfung auf mindestens 90 Unternehmen (typisch sind ~100-101)
-- Validierung aller erforderlichen Spalten
-- Bereinigung von Whitespace und Formatierungsfehlern
-- Ticker-Validierung (1-5 Großbuchstaben)
+- Checks for at least 90 companies (typically ~100-101)
+- Validates all required columns
+- Cleans whitespace and formatting errors
+- Ticker validation (1-5 uppercase letters)
 
-## Abhängigkeiten
+## Dependencies
 
-- `pandas>=1.3.0`: Datenmanipulation und CSV-Export
-- `requests>=2.25.0`: HTTP-Anfragen
-- `beautifulsoup4>=4.9.0`: HTML-Parsing als Fallback
-- `lxml>=4.6.0`: XML/HTML-Parser für pandas
-- `html5lib>=1.1`: Zusätzlicher HTML-Parser
+- `pandas>=1.3.0`: Data manipulation and CSV export
+- `requests>=2.25.0`: HTTP requests
+- `beautifulsoup4>=4.9.0`: HTML parsing as fallback
+- `lxml>=4.6.0`: XML/HTML parser for pandas
+- `html5lib>=1.1`: Additional HTML parser
 
-## Lizenz und Datenquelle
+## License and Data Sources
 
-### Datenquelle
-Die Daten werden von der Wikipedia-Seite "NASDAQ-100" abgerufen:
-- **Quelle**: [Wikipedia - NASDAQ-100](https://en.wikipedia.org/wiki/Nasdaq-100)
-- **Lizenz**: Die Wikipedia-Inhalte stehen unter der [Creative Commons Attribution-ShareAlike License 3.0 (CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
+### Data Sources
+The data is retrieved from the Wikipedia "NASDAQ-100" page:
+- **Primary Source**: [Wikipedia - NASDAQ-100](https://en.wikipedia.org/wiki/Nasdaq-100)
+- **Original Data Source**: Wikipedia references the official NASDAQ composition from [NASDAQ NDX Index](https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index) (as of 2025-06-22)
+- **License**: Wikipedia content is available under the [Creative Commons Attribution-ShareAlike License 3.0 (CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
 
-### Hinweise zur Nutzung der Wikipedia-Daten
-- Die Daten stammen aus Wikipedia und unterliegen der CC BY-SA 3.0 Lizenz
-- Bei Weiterverwendung muss Wikipedia als Quelle genannt werden
-- Abgeleitete Werke müssen unter derselben Lizenz veröffentlicht werden
-- Die Daten werden "wie besehen" bereitgestellt ohne Gewähr für Vollständigkeit oder Aktualität
-- Für Finanzentscheidungen sollten offizielle Quellen konsultiert werden
+### Usage Notes for Wikipedia Data
+- Data originates from Wikipedia and is subject to CC BY-SA 3.0 license
+- When redistributing, Wikipedia must be credited as the source
+- Derivative works must be published under the same license
+- Data is provided "as is" without warranty for completeness or accuracy
+- For financial decisions, please consult official sources
 
-## Fehlerbehebung
+### Data Chain
+The data flow is: **NASDAQ Official** → **Wikipedia** → **This Tool**
+- NASDAQ maintains the official index composition at nasdaq.com
+- Wikipedia editors update their page based on official NASDAQ data
+- This tool extracts the data from Wikipedia for programmatic use
 
-### Häufige Probleme
+## Troubleshooting
 
-1. **Netzwerkfehler**: Das Tool wiederholt automatisch bei temporären Verbindungsproblemen
-2. **Tabellenstruktur geändert**: Bei Änderungen der Wikipedia-Seite kann eine Anpassung der Spaltenerkennungslogik nötig sein
-3. **Abhängigkeiten fehlen**: Stellen Sie sicher, dass alle Pakete aus `requirements.txt` installiert sind
+### Common Issues
 
-### Debug-Informationen
+1. **Network errors**: The tool automatically retries on temporary connection problems
+2. **Table structure changed**: If Wikipedia page changes, column detection logic may need adjustment
+3. **Missing dependencies**: Ensure all packages from `requirements.txt` are installed
 
-Das Tool protokolliert detailliert alle Schritte. Bei Problemen prüfen Sie die Konsolen-Ausgabe für spezifische Fehlermeldungen.
+### Debug Information
 
-### Typische Ausgabe
+The tool logs all steps in detail. For issues, check console output for specific error messages.
+
+### Typical Output
 ```
 2025-06-22 08:27:58,468 - INFO - Attempt 1 of 3
 2025-06-22 08:27:58,468 - INFO - Trying to retrieve data with pandas.read_html()...
@@ -124,22 +131,22 @@ Das Tool protokolliert detailliert alle Schritte. Bei Problemen prüfen Sie die 
 2025-06-22 08:27:59,078 - INFO - Successfully retrieved 101 components with BeautifulSoup
 ```
 
-## Projektstruktur
+## Project Structure
 
 ```
 nasdaq100-scraper/
-├── nasdaq100_scraper.py    # Hauptskript
-├── requirements.txt        # Python-Abhängigkeiten
-├── README.md              # Diese Datei
-└── data/                  # Ausgabeverzeichnis
+├── nasdaq100_scraper.py    # Main script
+├── requirements.txt        # Python dependencies
+├── README.md              # This file
+└── data/                  # Output directory
     ├── nasdaq100_constituents.csv
     └── nasdaq100_constituents.json
 ```
 
-## Beitragen
+## Contributing
 
-Verbesserungen und Bugfixes sind willkommen! Bitte erstellen Sie einen Pull Request oder öffnen Sie ein Issue.
+Improvements and bug fixes are welcome! Please create a pull request or open an issue.
 
-## Haftungsausschluss
+## Disclaimer
 
-Dieses Tool dient nur zu Informationszwecken. Die Daten stammen aus Wikipedia und können unvollständig oder veraltet sein. Für Investitionsentscheidungen konsultieren Sie bitte offizielle Finanzquellen wie NASDAQ oder Bloomberg.
+This tool is for informational purposes only. The data comes from Wikipedia and may be incomplete or outdated. For investment decisions, please consult official financial sources such as NASDAQ or Bloomberg.
