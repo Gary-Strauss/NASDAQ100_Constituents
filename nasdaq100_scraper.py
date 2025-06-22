@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import time
 import random
 import logging
-from typing import Optional, List, Dict
+from typing import Optional, List
 import re
 import os
 from fake_useragent import UserAgent
