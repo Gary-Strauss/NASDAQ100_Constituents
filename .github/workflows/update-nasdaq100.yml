@@ -38,8 +38,11 @@ jobs:
       - name: Check for changes
         id: verify-changed-files
         run: |
-          git diff --quiet HEAD -- data/ || echo "changed=true" >> $GITHUB_OUTPUT
-          echo "changed=false" >> $GITHUB_OUTPUT
+          if git diff --quiet HEAD -- data/; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
       - name: Commit and push changes
         if: steps.verify-changed-files.outputs.changed == 'true'
         run: |
