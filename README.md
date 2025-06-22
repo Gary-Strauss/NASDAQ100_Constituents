@@ -6,6 +6,12 @@ A Python tool for retrieving and storing current NASDAQ-100 constituents from Wi
 
 This project scrapes the list of NASDAQ-100 companies from the Wikipedia page and saves the data in CSV and JSON formats. The tool uses multiple fallback strategies to ensure reliable data extraction.
 
+## Motivation
+
+This tool was created because I needed the NASDAQ-100 index composition for another project and thought it would be valuable to share this data source with the community. Rather than keeping it private, I decided to make it publicly available so others can benefit from automated access to current NASDAQ-100 constituent data.
+
+The goal is to provide a reliable, automated way to access this financial data that updates regularly and can be easily integrated into other projects, research, or analysis workflows.
+
 ## Features
 
 - **Multiple extraction methods**: Uses both `pandas.read_html()` and `BeautifulSoup` as fallback
@@ -30,6 +36,8 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Local Usage
+
 Run the script directly:
 
 ```bash
@@ -41,6 +49,44 @@ The tool will automatically:
 2. Validate and clean the data
 3. Save results to `data/nasdaq100_constituents.csv` and `data/nasdaq100_constituents.json`
 4. Display a summary of the first 5 entries
+
+### Automated Updates via GitHub Actions
+
+This repository automatically updates the NASDAQ-100 data monthly using GitHub Actions:
+
+- **Schedule**: 1st of every month at 10:00 UTC
+- **Manual trigger**: Available via GitHub Actions tab
+- **Automatic releases**: Creates tagged releases when data changes
+
+#### Access Current Data
+
+You can directly access the latest data from GitHub:
+
+**CSV Format:**
+```
+https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.csv
+```
+
+**JSON Format:**
+```
+https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.json
+```
+
+#### Programmatic Usage
+
+```python
+import pandas as pd
+import requests
+
+# Load latest CSV data directly from GitHub
+csv_url = "https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.csv"
+df = pd.read_csv(csv_url)
+
+# Or load JSON data
+json_url = "https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.json"
+response = requests.get(json_url)
+data = response.json()
+```
 
 ## Output Files
 
@@ -135,10 +181,13 @@ The tool logs all steps in detail. For issues, check console output for specific
 
 ```text
 nasdaq100-scraper/
-├── nasdaq100_scraper.py    # Main script
-├── requirements.txt        # Python dependencies
-├── README.md              # This file
-└── data/                  # Output directory
+├── .github/
+│   └── workflows/
+│       └── update-nasdaq100.yml  # GitHub Actions workflow
+├── nasdaq100_scraper.py          # Main script
+├── requirements.txt               # Python dependencies
+├── README.md                     # This file
+└── data/                         # Output directory
     ├── nasdaq100_constituents.csv
     └── nasdaq100_constituents.json
 ```
