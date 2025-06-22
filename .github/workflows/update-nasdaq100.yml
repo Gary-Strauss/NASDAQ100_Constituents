@@ -2,9 +2,9 @@ name: Update NASDAQ-100 Data
 
 on:
   schedule:
-    # Monatlich am 1. um 10:00 UTC ausführen
+    # Run monthly on the 1st at 10:00 UTC
     - cron: '0 10 1 * *'
-  workflow_dispatch: # Ermöglicht manuellen Start
+  workflow_dispatch: # Allows manual trigger
   push:
     branches: [ main ]
     paths: 
@@ -62,12 +62,12 @@ jobs:
         tag_name: data-${{ github.run_number }}
         release_name: NASDAQ-100 Data Update ${{ github.run_number }}
         body: |
-          Automatisches Update der NASDAQ-100 Daten
+          Automatic update of NASDAQ-100 data
           
-          📊 **Neue Daten verfügbar:**
+          📊 **New data available:**
           - CSV: [nasdaq100_constituents.csv](https://raw.githubusercontent.com/${{ github.repository }}/main/data/nasdaq100_constituents.csv)
           - JSON: [nasdaq100_constituents.json](https://raw.githubusercontent.com/${{ github.repository }}/main/data/nasdaq100_constituents.json)
           
-          🤖 Automatisch generiert am $(date +'%Y-%m-%d %H:%M:%S') UTC
+          🤖 Automatically generated on $(date +'%Y-%m-%d %H:%M:%S') UTC
         draft: false
         prerelease: false
