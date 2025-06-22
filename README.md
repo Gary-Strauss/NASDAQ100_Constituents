@@ -122,7 +122,7 @@ The data flow is: **NASDAQ Official** → **Wikipedia** → **This Tool**
 The tool logs all steps in detail. For issues, check console output for specific error messages.
 
 ### Typical Output
-```
+```text
 2025-06-22 08:27:58,468 - INFO - Attempt 1 of 3
 2025-06-22 08:27:58,468 - INFO - Trying to retrieve data with pandas.read_html()...
 2025-06-22 08:27:58,750 - WARNING - No suitable Components table found with pandas
@@ -133,7 +133,7 @@ The tool logs all steps in detail. For issues, check console output for specific
 
 ## Project Structure
 
-```
+```text
 nasdaq100-scraper/
 ├── nasdaq100_scraper.py    # Main script
 ├── requirements.txt        # Python dependencies
