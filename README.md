@@ -64,12 +64,12 @@ You can directly access the latest data from GitHub:
 
 **CSV Format:**
 ```
-https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.csv
+https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.csv
 ```
 
 **JSON Format:**
 ```
-https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.json
+https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.json
 ```
 
 #### Programmatic Usage
@@ -79,11 +79,11 @@ import pandas as pd
 import requests
 
 # Load latest CSV data directly from GitHub
-csv_url = "https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.csv"
+csv_url = "https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.csv"
 df = pd.read_csv(csv_url)
 
 # Or load JSON data
-json_url = "https://raw.githubusercontent.com/YOUR-USERNAME/nasdaq100-scraper/main/data/nasdaq100_constituents.json"
+json_url = "https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.json"
 response = requests.get(json_url)
 data = response.json()
 ```
