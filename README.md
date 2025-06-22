@@ -34,7 +34,7 @@ cd NASDAQ100_Constituents
 pip install -r requirements.txt
 ```
 
-## Usageo
+## Usage
 
 ### Local Usage
 
