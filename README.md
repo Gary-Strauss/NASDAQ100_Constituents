@@ -6,6 +6,12 @@ A Python tool for retrieving and storing current NASDAQ-100 constituents from Wi
 
 This project scrapes the list of NASDAQ-100 companies from the Wikipedia page and saves the data in CSV and JSON formats. The tool uses multiple fallback strategies to ensure reliable data extraction.
 
+## Motivation
+
+This tool was created because I needed the NASDAQ-100 index composition for another project and thought it would be valuable to share this data source with the community. Rather than keeping it private, I decided to make it publicly available so others can benefit from automated access to current NASDAQ-100 constituent data.
+
+The goal is to provide a reliable, automated way to access this financial data that updates regularly and can be easily integrated into other projects, research, or analysis workflows.
+
 ## Features
 
 - **Multiple extraction methods**: Uses both `pandas.read_html()` and `BeautifulSoup` as fallback
