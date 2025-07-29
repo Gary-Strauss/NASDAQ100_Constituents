@@ -2,79 +2,51 @@ name: Update NASDAQ-100 Data
 
 on:
   schedule:
-    # Run monthly on the 1st at 10:00 UTC
+    # Läuft wöchentlich am Sonntag um 06:00 UTC
     - cron: '0 6 * * 0'
-  workflow_dispatch: # Allows manual trigger
-  push:
-    branches: [ master ]
-    paths: 
-      - 'nasdaq100_scraper.py'
-      - '.github/workflows/update-nasdaq100.yml'
+  workflow_dispatch: # Ermöglicht manuellen Start
 
 jobs:
-  update-nasdaq100:
+  update-and-create-pr:
     runs-on: ubuntu-latest
+    # Berechtigungen für das Schreiben von Inhalten und das Erstellen von PRs
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Run NASDAQ-100 scraper
+        id: scraper
         run: |
           python nasdaq100_scraper.py
-          
-      - name: Check for changes
-        id: verify-changed-files
-        run: |
-          git add data/
-          if git diff --quiet --cached; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
-      - name: Commit and push changes
-        if: steps.verify-changed-files.outputs.changed == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add data/
-          git commit -m "chore: Update NASDAQ-100 data $(date +'%Y-%m-%d')"
-          git push
-          
-      - name: Get current timestamp
-        if: steps.verify-changed-files.outputs.changed == 'true'
-        id: timestamp
-        run: echo "datetime=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
-          
-      - name: Create Release
-        if: steps.verify-changed-files.outputs.changed == 'true'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
         with:
-          tag_name: data-${{ github.run_number }}
-          release_name: NASDAQ-100 Data Update ${{ github.run_number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Konfiguration für den Commit und den Pull Request
+          commit-message: "chore: Update NASDAQ-100 data"
+          title: "🤖 chore: Update NASDAQ-100 data"
           body: |
-            Automatic update of NASDAQ-100 data
-            
-            📊 **New data available:**
-            - CSV: [nasdaq100_constituents.csv](https://raw.githubusercontent.com/${{ github.repository }}/master/data/nasdaq100_constituents.csv)
-            - JSON: [nasdaq100_constituents.json](https://raw.githubusercontent.com/${{ github.repository }}/master/data/nasdaq100_constituents.json)
-            
-            🤖 Automatically generated on ${{ steps.timestamp.outputs.datetime }} UTC
-          draft: false
-          prerelease: false
+            Automatische Aktualisierung der NASDAQ-100 Daten.
+
+            Dieser Pull Request wurde von einer GitHub Action erstellt und enthält die neuesten Daten. Bitte mergen, um die Änderungen zu übernehmen und ein neues Release zu erstellen.
+          # Branch, der für den PR erstellt wird
+          branch: chore/update-nasdaq-data
+          # Ziel-Branch, in den gemerged werden soll
+          base: master
+          # Löscht den Branch automatisch nach dem Mergen
+          delete-branch: true
