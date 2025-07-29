@@ -54,12 +54,6 @@
     "GICS_Sub_Industry":"Semiconductors"
   },
   {
-    "Ticker":"ANSS",
-    "Company":"Ansys",
-    "GICS_Sector":"Information Technology",
-    "GICS_Sub_Industry":"Application Software"
-  },
-  {
     "Ticker":"AAPL",
     "Company":"Apple Inc.",
     "GICS_Sector":"Information Technology",
@@ -540,16 +534,16 @@
     "GICS_Sub_Industry":"Application Software"
   },
   {
-    "Ticker":"TTWO",
-    "Company":"Take-Two Interactive",
-    "GICS_Sector":"Communication Services",
-    "GICS_Sub_Industry":"Interactive Home Entertainment"
-  },
-  {
     "Ticker":"TMUS",
     "Company":"T-Mobile US",
     "GICS_Sector":"Communication Services",
     "GICS_Sub_Industry":"Wireless Telecommunication Services"
+  },
+  {
+    "Ticker":"TTWO",
+    "Company":"Take-Two Interactive",
+    "GICS_Sector":"Communication Services",
+    "GICS_Sub_Industry":"Interactive Home Entertainment"
   },
   {
     "Ticker":"TSLA",
@@ -562,6 +556,12 @@
     "Company":"Texas Instruments",
     "GICS_Sector":"Information Technology",
     "GICS_Sub_Industry":"Semiconductors"
+  },
+  {
+    "Ticker":"TRI",
+    "Company":"Thomson Reuters",
+    "GICS_Sector":"Industrials",
+    "GICS_Sub_Industry":"Research & Consulting Services"
   },
   {
     "Ticker":"TTD",
