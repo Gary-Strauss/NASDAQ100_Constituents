@@ -8,7 +8,6 @@ AMZN,Amazon,Consumer Discretionary,Broadline Retail
 AEP,American Electric Power,Utilities,Electric Utilities
 AMGN,Amgen,Health Care,Biotechnology
 ADI,Analog Devices,Information Technology,Semiconductors
-ANSS,Ansys,Information Technology,Application Software
 AAPL,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals"
 AMAT,Applied Materials,Information Technology,Semiconductor Equipment
 APP,AppLovin,Information Technology,Application Software
@@ -89,10 +88,11 @@ ROST,Ross Stores,Consumer Discretionary,Apparel Retail
 SHOP,Shopify,Information Technology,Application Software
 SBUX,Starbucks,Consumer Discretionary,Restaurants
 SNPS,Synopsys,Information Technology,Application Software
-TTWO,Take-Two Interactive,Communication Services,Interactive Home Entertainment
 TMUS,T-Mobile US,Communication Services,Wireless Telecommunication Services
+TTWO,Take-Two Interactive,Communication Services,Interactive Home Entertainment
 TSLA,"Tesla, Inc.",Consumer Discretionary,Automobile Manufacturers
 TXN,Texas Instruments,Information Technology,Semiconductors
+TRI,Thomson Reuters,Industrials,Research & Consulting Services
 TTD,Trade Desk (The),Communication Services,Advertising
 VRSK,Verisk Analytics,Industrials,Research & Consulting Services
 VRTX,Vertex Pharmaceuticals,Health Care,Biotechnology
