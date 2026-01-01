@@ -16,6 +16,13 @@ logger = logging.getLogger(__name__)
 # User-Agent generator for consistent usage across functions
 USER_AGENT = UserAgent()
 
+# Configuration constants
+HTTP_REQUEST_TIMEOUT = 30  # Timeout in seconds for HTTP requests
+MIN_TABLE_ROWS = 50  # Minimum rows to consider a table as the components table
+MIN_EXPECTED_COMPONENTS = 90  # Minimum number of expected Nasdaq-100 components
+MAX_EXPECTED_COMPONENTS = 110  # Maximum number of expected Nasdaq-100 components
+RETRY_BACKOFF_BASE = 2  # Base for exponential backoff calculation
+
 def get_nasdaq100_components() -> pd.DataFrame:
     """
     Main function to retrieve Nasdaq-100 components from Wikipedia.
@@ -155,7 +162,7 @@ def _fetch_page_content(url: str) -> BeautifulSoup:
         'User-Agent': USER_AGENT.random
     }
     
-    response = requests.get(url, headers=headers, timeout=30)
+    response = requests.get(url, headers=headers, timeout=HTTP_REQUEST_TIMEOUT)
     response.raise_for_status()
     
     return BeautifulSoup(response.content, 'html.parser')
@@ -190,7 +197,7 @@ def _locate_components_table(soup: BeautifulSoup) -> Optional[object]:
     
     for table in tables:
         rows = table.find_all('tr')
-        if len(rows) > max_rows and len(rows) > 50:  # At least 50 rows for Nasdaq-100
+        if len(rows) > max_rows and len(rows) > MIN_TABLE_ROWS:
             first_row = rows[0] if rows else None
             if first_row and len(first_row.find_all(['th', 'td'])) >= 4:
                 largest_table = table
@@ -433,11 +440,11 @@ def validate_dataframe(df: pd.DataFrame) -> bool:
         logger.error("DataFrame is empty")
         return False
     
-    if len(df) < 90:  # Nasdaq-100 should have ~100 components
+    if len(df) < MIN_EXPECTED_COMPONENTS:
         logger.warning(f"Only {len(df)} components found, expected ~100")
         return False
     
-    if len(df) > 110:  # Not more than 110
+    if len(df) > MAX_EXPECTED_COMPONENTS:
         logger.warning(f"Too many components found: {len(df)}")
         return False
     
@@ -461,7 +468,7 @@ def get_nasdaq100_with_retry(max_retries: int = 3) -> pd.DataFrame:
             
             # Random delay between requests
             if attempt > 0:
-                delay = (2 ** attempt) + random.uniform(0, 1)
+                delay = (RETRY_BACKOFF_BASE ** attempt) + random.uniform(0, 1)
                 logger.info(f"Waiting {delay:.2f} seconds before retry...")
                 time.sleep(delay)
             
