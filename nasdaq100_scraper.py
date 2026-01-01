@@ -385,7 +385,9 @@ def clean_text(text: str) -> str:
     text = text.strip()
     # Remove special Wikipedia characters
     text = re.sub(r'\[.*?\]', '', text)  # [edit] links etc.
-    
+    # Strip again after removing brackets
+    text = text.strip()
+
     return text
 
 def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
