@@ -1,102 +1,102 @@
 Ticker,Company,GICS_Sector,GICS_Sub_Industry
-ADBE,Adobe Inc.,Information Technology,Application Software
-AMD,Advanced Micro Devices,Information Technology,Semiconductors
-ABNB,Airbnb,Consumer Discretionary,"Hotels, Resorts & Cruise Lines"
-GOOGL,Alphabet Inc. (Class A),Communication Services,Interactive Media & Services
-GOOG,Alphabet Inc. (Class C),Communication Services,Interactive Media & Services
-AMZN,Amazon,Consumer Discretionary,Broadline Retail
-AEP,American Electric Power,Utilities,Electric Utilities
-AMGN,Amgen,Health Care,Biotechnology
-ADI,Analog Devices,Information Technology,Semiconductors
-AAPL,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals"
-AMAT,Applied Materials,Information Technology,Semiconductor Equipment
-APP,AppLovin,Information Technology,Application Software
-ARM,Arm Holdings,Information Technology,Semiconductors
-ASML,ASML Holding,Information Technology,Semiconductor Equipment
-AZN,AstraZeneca,Health Care,Pharmaceuticals
-TEAM,Atlassian,Information Technology,Application Software
-ADSK,Autodesk,Information Technology,Application Software
-ADP,Automatic Data Processing,Industrials,Human Resource & Employment Services
-AXON,Axon Enterprise,Industrials,Aerospace & Defense
-BKR,Baker Hughes,Energy,Oil & Gas Equipment & Services
-BIIB,Biogen,Health Care,Biotechnology
-BKNG,Booking Holdings,Consumer Discretionary,"Hotels, Resorts & Cruise Lines"
-AVGO,Broadcom,Information Technology,Semiconductors
-CDNS,Cadence Design Systems,Information Technology,Application Software
-CDW,CDW Corporation,Information Technology,Technology Distributors
-CHTR,Charter Communications,Communication Services,Cable & Satellite
-CTAS,Cintas,Industrials,Diversified Support Services
-CSCO,Cisco,Information Technology,Communications Equipment
-CCEP,Coca-Cola Europacific Partners,Consumer Staples,Soft Drinks & Non-alcoholic Beverages
-CTSH,Cognizant,Information Technology,IT Consulting & Other Services
-CMCSA,Comcast,Communication Services,Cable & Satellite
-CEG,Constellation Energy,Utilities,Electric Utilities
-CPRT,Copart,Industrials,Diversified Support Services
-CSGP,CoStar Group,Real Estate,Real Estate Services
-COST,Costco,Consumer Staples,Consumer Staples Merchandise Retail
-CRWD,CrowdStrike,Information Technology,Systems Software
-CSX,CSX Corporation,Industrials,Rail Transportation
-DDOG,Datadog,Information Technology,Application Software
-DXCM,DexCom,Health Care,Health Care Equipment
-FANG,Diamondback Energy,Energy,Oil & Gas Exploration & Production
-DASH,DoorDash,Consumer Discretionary,Specialized Consumer Services
-EA,Electronic Arts,Communication Services,Interactive Home Entertainment
-EXC,Exelon,Utilities,Electric Utilities
-FAST,Fastenal,Industrials,Trading Companies & Distributors
-FTNT,Fortinet,Information Technology,Systems Software
-GEHC,GE HealthCare,Health Care,Health Care Equipment
-GILD,Gilead Sciences,Health Care,Biotechnology
-GFS,GlobalFoundries,Information Technology,Semiconductors
-HON,Honeywell,Industrials,Industrial Conglomerates
-IDXX,Idexx Laboratories,Health Care,Health Care Equipment
-INTC,Intel,Information Technology,Semiconductors
-INTU,Intuit,Information Technology,Application Software
-ISRG,Intuitive Surgical,Health Care,Health Care Equipment
-KDP,Keurig Dr Pepper,Consumer Staples,Soft Drinks & Non-alcoholic Beverages
-KLAC,KLA Corporation,Information Technology,Semiconductor Equipment
-KHC,Kraft Heinz,Consumer Staples,Packaged Foods & Meats
-LRCX,Lam Research,Information Technology,Semiconductor Equipment
-LIN,Linde plc,Materials,Industrial Gases
-LULU,Lululemon,Consumer Discretionary,"Apparel, Accessories & Luxury Goods"
-MAR,Marriott International,Consumer Discretionary,"Hotels, Resorts & Cruise Lines"
-MRVL,Marvell Technology,Information Technology,Application Software
-MELI,Mercado Libre,Consumer Discretionary,Broadline Retail
-META,Meta Platforms,Communication Services,Interactive Media & Services
-MCHP,Microchip Technology,Information Technology,Semiconductors
-MU,Micron Technology,Information Technology,Semiconductors
-MSFT,Microsoft,Information Technology,Systems Software
-MSTR,MicroStrategy,Information Technology,Application Software
-MDLZ,Mondelez International,Consumer Staples,Packaged Foods & Meats
-MNST,Monster Beverage,Consumer Staples,Soft Drinks & Non-alcoholic Beverages
-NFLX,"Netflix, Inc.",Communication Services,Movies & Entertainment
-NVDA,Nvidia,Information Technology,Semiconductors
-NXPI,NXP Semiconductors,Information Technology,Semiconductors
-ORLY,O'Reilly Automotive,Consumer Discretionary,Automotive Retail
-ODFL,Old Dominion Freight Line,Industrials,Cargo Ground Transportation
-ON,Onsemi,Information Technology,Semiconductors
-PCAR,Paccar,Industrials,Construction Machinery & Heavy Transportation Equipment
-PLTR,Palantir Technologies,Information Technology,Application Software
-PANW,Palo Alto Networks,Information Technology,Systems Software
-PAYX,Paychex,Industrials,Human Resource & Employment Services
-PYPL,PayPal,Financials,Transaction & Payment Processing Services
-PDD,PDD Holdings,Consumer Discretionary,Broadline Retail
-PEP,PepsiCo,Consumer Staples,Soft Drinks & Non-alcoholic Beverages
-QCOM,Qualcomm,Information Technology,Semiconductors
-REGN,Regeneron Pharmaceuticals,Health Care,Biotechnology
-ROP,Roper Technologies,Information Technology,Electronic Equipment & Instruments
-ROST,Ross Stores,Consumer Discretionary,Apparel Retail
-SHOP,Shopify,Information Technology,Application Software
-SBUX,Starbucks,Consumer Discretionary,Restaurants
-SNPS,Synopsys,Information Technology,Application Software
-TMUS,T-Mobile US,Communication Services,Wireless Telecommunication Services
-TTWO,Take-Two Interactive,Communication Services,Interactive Home Entertainment
-TSLA,"Tesla, Inc.",Consumer Discretionary,Automobile Manufacturers
-TXN,Texas Instruments,Information Technology,Semiconductors
-TRI,Thomson Reuters,Industrials,Research & Consulting Services
-TTD,Trade Desk (The),Communication Services,Advertising
-VRSK,Verisk Analytics,Industrials,Research & Consulting Services
-VRTX,Vertex Pharmaceuticals,Health Care,Biotechnology
-WBD,Warner Bros. Discovery,Communication Services,Broadcasting
-WDAY,"Workday, Inc.",Information Technology,Application Software
-XEL,Xcel Energy,Utilities,Multi-Utilities
-ZS,Zscaler,Information Technology,Application Software
+ADBE,Adobe Inc.,Computer Software,Computer Software
+AMD,Advanced Micro Devices,Semiconductors,Semiconductors
+ABNB,Airbnb,Diversified Commercial Services,Diversified Commercial Services
+ALNY,Alnylam Pharmaceuticals,Biotechnology,Biotechnology
+GOOGL,Alphabet Inc. (Class A),Computer Software,Computer Software
+GOOG,Alphabet Inc. (Class C),Computer Software,Computer Software
+AMZN,Amazon,Catalog/Specialty Distribution,Catalog/Specialty Distribution
+AEP,American Electric Power,Electric Utilities,Electric Utilities
+AMGN,Amgen,Biotechnology,Biotechnology
+ADI,Analog Devices,Semiconductors,Semiconductors
+AAPL,Apple Inc.,Computer Manufacturing,Computer Manufacturing
+AMAT,Applied Materials,Semiconductors,Semiconductors
+APP,AppLovin,Computer Software,Computer Software
+ARM,Arm Holdings,Semiconductors,Semiconductors
+ASML,ASML Holding,Industrial Machinery,Industrial Machinery
+AZN,AstraZeneca,Biotechnology,Biotechnology
+TEAM,Atlassian,Computer Software,Computer Software
+ADSK,Autodesk,Computer Software,Computer Software
+ADP,Automatic Data Processing,Diversified Commercial Services,Diversified Commercial Services
+AXON,Axon Enterprise,Ordnance & Accessories,Ordnance & Accessories
+BKR,Baker Hughes,Oil Equipment & Services,Oil Equipment & Services
+BKNG,Booking Holdings,Transportation Services,Transportation Services
+AVGO,Broadcom,Semiconductors,Semiconductors
+CDNS,Cadence Design Systems,Computer Software,Computer Software
+CHTR,Charter Communications,Cable & Other Pay Television Services,Cable & Other Pay Television Services
+CTAS,Cintas,Garments & Clothing,Garments & Clothing
+CSCO,Cisco,Computer Communications Equipment,Computer Communications Equipment
+CCEP,Coca-Cola Europacific Partners,Beverages,Beverages
+CTSH,Cognizant,EDP Services,EDP Services
+CMCSA,Comcast,Cable & Other Pay Television Services,Cable & Other Pay Television Services
+CEG,Constellation Energy,Electric Utilities,Electric Utilities
+CPRT,Copart,Retail,Retail
+CSGP,CoStar Group,Real Estate,Real Estate
+COST,Costco,Department/Specialty Retail Stores,Department/Specialty Retail Stores
+CRWD,CrowdStrike,Computer Software,Computer Software
+CSX,CSX Corporation,Railroads,Railroads
+DDOG,Datadog,Computer Software,Computer Software
+DXCM,DexCom,Medical/Dental Instruments,Medical/Dental Instruments
+FANG,Diamondback Energy,Oil & Gas Production,Oil & Gas Production
+DASH,DoorDash,EDP Services,EDP Services
+EA,Electronic Arts,Miscellaneous Amusement & Recreation Services,Miscellaneous Amusement & Recreation Services
+EXC,Exelon,Power Generation,Power Generation
+FAST,Fastenal,Construction & Materials,Construction & Materials
+FER,Ferrovial,"Military, Government, Technical","Military, Government, Technical"
+FTNT,Fortinet,Computer Peripheral Equipment,Computer Peripheral Equipment
+GEHC,GE HealthCare,Medical Electronics,Medical Electronics
+GILD,Gilead Sciences,Biotechnology,Biotechnology
+HON,Honeywell,Aerospace,Aerospace
+IDXX,Idexx Laboratories,Biotechnology,Biotechnology
+INSM,Insmed Incorporated,Biotechnology,Biotechnology
+INTC,Intel,Semiconductors,Semiconductors
+INTU,Intuit,Computer Software,Computer Software
+ISRG,Intuitive Surgical,Industrial Specialties,Industrial Specialties
+KDP,Keurig Dr Pepper,Beverages,Beverages
+KLAC,KLA Corporation,Electronic Components,Electronic Components
+KHC,Kraft Heinz,Packaged Foods,Packaged Foods
+LRCX,Lam Research,Industrial Machinery,Industrial Machinery
+LIN,Linde plc,Major Chemicals,Major Chemicals
+MAR,Marriott International,Hotels/Resorts,Hotels/Resorts
+MRVL,Marvell Technology,Semiconductors,Semiconductors
+MELI,Mercado Libre,Catalog/Specialty Distribution,Catalog/Specialty Distribution
+META,Meta Platforms,Computer Software,Computer Software
+MCHP,Microchip Technology,Semiconductors,Semiconductors
+MU,Micron Technology,Semiconductors,Semiconductors
+MSFT,Microsoft,Computer Software,Computer Software
+MSTR,MicroStrategy,Computer Software,Computer Software
+MDLZ,Mondelez International,Packaged Foods,Packaged Foods
+MPWR,Monolithic Power Systems,Semiconductors,Semiconductors
+MNST,Monster Beverage,Beverages,Beverages
+NFLX,"Netflix, Inc.",Consumer Electronics,Consumer Electronics
+NVDA,Nvidia,Semiconductors,Semiconductors
+NXPI,NXP Semiconductors,Semiconductors,Semiconductors
+ORLY,O'Reilly Automotive,Auto & Home Supply Stores,Auto & Home Supply Stores
+ODFL,Old Dominion Freight Line,Trucking Freight/Courier Services,Trucking Freight/Courier Services
+PCAR,Paccar,Motor Vehicles,Motor Vehicles
+PLTR,Palantir Technologies,Computer Software,Computer Software
+PANW,Palo Alto Networks,Computer Peripheral Equipment,Computer Peripheral Equipment
+PAYX,Paychex,Diversified Commercial Services,Diversified Commercial Services
+PYPL,PayPal,Diversified Commercial Services,Diversified Commercial Services
+PDD,PDD Holdings,EDP Services,EDP Services
+PEP,PepsiCo,Beverages,Beverages
+QCOM,Qualcomm,Broadcasting & Communications Equipment,Broadcasting & Communications Equipment
+REGN,Regeneron Pharmaceuticals,Biotechnology,Biotechnology
+ROP,Roper Technologies,Computer Software,Computer Software
+ROST,Ross Stores,Clothing/Shoe/Accessory Stores,Clothing/Shoe/Accessory Stores
+STX,Seagate Technology,Electronic Components,Electronic Components
+SHOP,Shopify,Computer Software,Computer Software
+SBUX,Starbucks,Restaurants,Restaurants
+SNPS,Synopsys,Computer Software,Computer Software
+TMUS,T-Mobile US,Telecommunications Service Providers,Telecommunications Service Providers
+TTWO,Take-Two Interactive,Miscellaneous Amusement & Recreation Services,Miscellaneous Amusement & Recreation Services
+TSLA,"Tesla, Inc.",Automobiles & Parts,Automobiles & Parts
+TXN,Texas Instruments,Semiconductors,Semiconductors
+TRI,Thomson Reuters,Computer Software,Computer Software
+VRSK,Verisk Analytics,Diversified Commercial Services,Diversified Commercial Services
+VRTX,Vertex Pharmaceuticals,Biotechnology,Biotechnology
+WBD,Warner Bros. Discovery,Miscellaneous Amusement & Recreation Services,Miscellaneous Amusement & Recreation Services
+WDC,Western Digital,Electronic Components,Electronic Components
+WDAY,"Workday, Inc.",EDP Services,EDP Services
+XEL,Xcel Energy,Power Generation,Power Generation
+ZS,Zscaler,EDP Services,EDP Services
