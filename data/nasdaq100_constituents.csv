@@ -14,7 +14,6 @@ AMAT,Applied Materials,Semiconductors,Semiconductors
 APP,AppLovin,Computer Software,Computer Software
 ARM,Arm Holdings,Semiconductors,Semiconductors
 ASML,ASML Holding,Industrial Machinery,Industrial Machinery
-AZN,AstraZeneca,Biotechnology,Biotechnology
 TEAM,Atlassian,Computer Software,Computer Software
 ADSK,Autodesk,Computer Software,Computer Software
 ADP,Automatic Data Processing,Diversified Commercial Services,Diversified Commercial Services
@@ -26,7 +25,7 @@ CDNS,Cadence Design Systems,Computer Software,Computer Software
 CHTR,Charter Communications,Cable & Other Pay Television Services,Cable & Other Pay Television Services
 CTAS,Cintas,Garments & Clothing,Garments & Clothing
 CSCO,Cisco,Computer Communications Equipment,Computer Communications Equipment
-CCEP,Coca-Cola Europacific Partners,Beverages,Beverages
+CCEP,Coca-Cola Europacific Partners,Soft Drinks,Soft Drinks
 CTSH,Cognizant,EDP Services,EDP Services
 CMCSA,Comcast,Cable & Other Pay Television Services,Cable & Other Pay Television Services
 CEG,Constellation Energy,Electric Utilities,Electric Utilities
@@ -52,7 +51,7 @@ INSM,Insmed Incorporated,Biotechnology,Biotechnology
 INTC,Intel,Semiconductors,Semiconductors
 INTU,Intuit,Computer Software,Computer Software
 ISRG,Intuitive Surgical,Industrial Specialties,Industrial Specialties
-KDP,Keurig Dr Pepper,Beverages,Beverages
+KDP,Keurig Dr Pepper,Soft Drinks,Soft Drinks
 KLAC,KLA Corporation,Electronic Components,Electronic Components
 KHC,Kraft Heinz,Packaged Foods,Packaged Foods
 LRCX,Lam Research,Industrial Machinery,Industrial Machinery
@@ -67,7 +66,7 @@ MSFT,Microsoft,Computer Software,Computer Software
 MSTR,MicroStrategy,Computer Software,Computer Software
 MDLZ,Mondelez International,Packaged Foods,Packaged Foods
 MPWR,Monolithic Power Systems,Semiconductors,Semiconductors
-MNST,Monster Beverage,Beverages,Beverages
+MNST,Monster Beverage,Soft Drinks,Soft Drinks
 NFLX,"Netflix, Inc.",Consumer Electronics,Consumer Electronics
 NVDA,Nvidia,Semiconductors,Semiconductors
 NXPI,NXP Semiconductors,Semiconductors,Semiconductors
@@ -79,7 +78,7 @@ PANW,Palo Alto Networks,Computer Peripheral Equipment,Computer Peripheral Equipm
 PAYX,Paychex,Diversified Commercial Services,Diversified Commercial Services
 PYPL,PayPal,Diversified Commercial Services,Diversified Commercial Services
 PDD,PDD Holdings,EDP Services,EDP Services
-PEP,PepsiCo,Beverages,Beverages
+PEP,PepsiCo,Soft Drinks,Soft Drinks
 QCOM,Qualcomm,Broadcasting & Communications Equipment,Broadcasting & Communications Equipment
 REGN,Regeneron Pharmaceuticals,Biotechnology,Biotechnology
 ROP,Roper Technologies,Computer Software,Computer Software
@@ -95,6 +94,7 @@ TXN,Texas Instruments,Semiconductors,Semiconductors
 TRI,Thomson Reuters,Computer Software,Computer Software
 VRSK,Verisk Analytics,Diversified Commercial Services,Diversified Commercial Services
 VRTX,Vertex Pharmaceuticals,Biotechnology,Biotechnology
+WMT,Walmart,Department/Specialty Retail Stores,Department/Specialty Retail Stores
 WBD,Warner Bros. Discovery,Miscellaneous Amusement & Recreation Services,Miscellaneous Amusement & Recreation Services
 WDC,Western Digital,Electronic Components,Electronic Components
 WDAY,"Workday, Inc.",EDP Services,EDP Services

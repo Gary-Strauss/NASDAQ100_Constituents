@@ -90,12 +90,6 @@
     "GICS_Sub_Industry":"Industrial Machinery"
   },
   {
-    "Ticker":"AZN",
-    "Company":"AstraZeneca",
-    "GICS_Sector":"Biotechnology",
-    "GICS_Sub_Industry":"Biotechnology"
-  },
-  {
     "Ticker":"TEAM",
     "Company":"Atlassian",
     "GICS_Sector":"Computer Software",
@@ -164,8 +158,8 @@
   {
     "Ticker":"CCEP",
     "Company":"Coca-Cola Europacific Partners",
-    "GICS_Sector":"Beverages",
-    "GICS_Sub_Industry":"Beverages"
+    "GICS_Sector":"Soft Drinks",
+    "GICS_Sub_Industry":"Soft Drinks"
   },
   {
     "Ticker":"CTSH",
@@ -320,8 +314,8 @@
   {
     "Ticker":"KDP",
     "Company":"Keurig Dr Pepper",
-    "GICS_Sector":"Beverages",
-    "GICS_Sub_Industry":"Beverages"
+    "GICS_Sector":"Soft Drinks",
+    "GICS_Sub_Industry":"Soft Drinks"
   },
   {
     "Ticker":"KLAC",
@@ -410,8 +404,8 @@
   {
     "Ticker":"MNST",
     "Company":"Monster Beverage",
-    "GICS_Sector":"Beverages",
-    "GICS_Sub_Industry":"Beverages"
+    "GICS_Sector":"Soft Drinks",
+    "GICS_Sub_Industry":"Soft Drinks"
   },
   {
     "Ticker":"NFLX",
@@ -482,8 +476,8 @@
   {
     "Ticker":"PEP",
     "Company":"PepsiCo",
-    "GICS_Sector":"Beverages",
-    "GICS_Sub_Industry":"Beverages"
+    "GICS_Sector":"Soft Drinks",
+    "GICS_Sub_Industry":"Soft Drinks"
   },
   {
     "Ticker":"QCOM",
@@ -574,6 +568,12 @@
     "Company":"Vertex Pharmaceuticals",
     "GICS_Sector":"Biotechnology",
     "GICS_Sub_Industry":"Biotechnology"
+  },
+  {
+    "Ticker":"WMT",
+    "Company":"Walmart",
+    "GICS_Sector":"Department\/Specialty Retail Stores",
+    "GICS_Sub_Industry":"Department\/Specialty Retail Stores"
   },
   {
     "Ticker":"WBD",
