@@ -542,7 +542,7 @@ class TestGetNasdaq100Components:
         result = get_nasdaq100_components()
 
         assert len(result) == 100
-        assert mock_pandas.called
+        mock_pandas.assert_called_once_with('https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies')
 
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
@@ -584,7 +584,7 @@ class TestGetNasdaq100Components:
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
     def test_get_components_follows_list_article(self, mock_pandas, mock_bs, mock_find, mock_search):
         """Test that a linked list article is tried when the index article has no table."""
-        list_url = 'https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies'
+        list_url = 'https://en.wikipedia.org/wiki/Nasdaq-100_components'
         mock_df = pd.DataFrame({
             'Ticker': ['AAPL'] * 100,
             'Company': ['Apple'] * 100,

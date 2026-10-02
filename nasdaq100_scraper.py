@@ -32,6 +32,8 @@ MAX_EXPECTED_COMPONENTS = 110  # Maximum number of expected Nasdaq-100 component
 RETRY_BACKOFF_BASE = 2  # Base for exponential backoff calculation
 WIKIPEDIA_BASE_URL = "https://en.wikipedia.org"
 NASDAQ100_URL = f"{WIKIPEDIA_BASE_URL}/wiki/Nasdaq-100"
+# The components table moved out of the index article into this list article
+NASDAQ100_LIST_URL = f"{WIKIPEDIA_BASE_URL}/wiki/List_of_NASDAQ-100_companies"
 WIKIPEDIA_API_URL = f"{WIKIPEDIA_BASE_URL}/w/api.php"
 # Title keywords that mark an article as a likely home of the components list
 LIST_ARTICLE_KEYWORDS = ['list', 'compan', 'component', 'constituent']
@@ -42,20 +44,24 @@ def get_nasdaq100_components() -> pd.DataFrame:
     Main function to retrieve Nasdaq-100 components from Wikipedia.
     Uses pandas.read_html() as primary method with BeautifulSoup as fallback.
     
-    The index article is tried first. If it no longer contains the components
-    table, the "List of ..." articles it links to are tried, since Wikipedia
-    has started moving constituent lists into separate list articles.
+    The list article is tried first, then the index article. If neither
+    contains the components table, list articles linked from the index
+    article or found via the Wikipedia search are tried, in case the list
+    moves again.
     
     Returns:
         pandas.DataFrame: DataFrame with Ticker, Company, GICS_Sector, GICS_Sub_Industry
     """
-    df = _get_components_from_url(NASDAQ100_URL)
-    if df is not None:
-        return df
+    for url in [NASDAQ100_LIST_URL, NASDAQ100_URL]:
+        logger.info(f"Trying article: {url}")
+        df = _get_components_from_url(url)
+        if df is not None:
+            return df
     
+    known_urls = [NASDAQ100_LIST_URL.lower(), NASDAQ100_URL.lower()]
     candidate_urls = []
     for list_url in _find_list_article_urls(NASDAQ100_URL) + _search_list_articles():
-        if list_url != NASDAQ100_URL and list_url not in candidate_urls:
+        if list_url.lower() not in known_urls and list_url not in candidate_urls:
             candidate_urls.append(list_url)
     
     for list_url in candidate_urls:

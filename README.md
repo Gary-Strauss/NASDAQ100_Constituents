@@ -140,7 +140,7 @@ The tool currently extracts 101 companies, including:
 
 ### Data Sources
 The data is retrieved from the Wikipedia "NASDAQ-100" page:
-- **Primary Source**: [Wikipedia - NASDAQ-100](https://en.wikipedia.org/wiki/Nasdaq-100)
+- **Primary Source**: [Wikipedia - List of NASDAQ-100 companies](https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies) (with fallbacks to the [Nasdaq-100 article](https://en.wikipedia.org/wiki/Nasdaq-100) and a Wikipedia search)
 - **Original Data Source**: Wikipedia references the official NASDAQ composition from [NASDAQ NDX Index](https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index) (as of 2025-06-22)
 - **License**: Wikipedia content is available under the [Creative Commons Attribution-ShareAlike License 3.0 (CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
 
