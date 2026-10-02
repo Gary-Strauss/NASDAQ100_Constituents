@@ -7,14 +7,21 @@ import logging
 from typing import Optional, List, Dict
 import re
 import os
-from fake_useragent import UserAgent
+import sys
+from io import StringIO
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# User-Agent generator for consistent usage across functions
-USER_AGENT = UserAgent()
+# Descriptive User-Agent as required by the Wikimedia User-Agent policy
+# (https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
+# Generic or spoofed browser User-Agents are rejected with HTTP 403.
+USER_AGENT = (
+    "NASDAQ100ConstituentsBot/1.0 "
+    "(https://github.com/Gary-Strauss/NASDAQ100_Constituents) "
+    f"python-requests/{requests.__version__}"
+)
 
 # Configuration constants
 HTTP_REQUEST_TIMEOUT = 30  # Timeout in seconds for HTTP requests
@@ -62,13 +69,12 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
-    headers = {
-        'User-Agent': USER_AGENT.random
-    }
-    
     try:
+        # Fetch the page ourselves so the required User-Agent header is sent
+        html = _fetch_html(url)
+        
         # Read all tables from the page
-        tables = pd.read_html(url, header=0, attrs={'class': 'wikitable'})
+        tables = pd.read_html(StringIO(html), header=0, attrs={'class': 'wikitable'})
         
         # Search for the Components table
         for table in tables:
@@ -145,6 +151,28 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
         logger.error(f"Error with pandas.read_html(): {e}")
         return None
 
+def _fetch_html(url: str) -> str:
+    """
+    Fetch the raw HTML of a Wikipedia page.
+    
+    Args:
+        url: Wikipedia URL
+        
+    Returns:
+        Page HTML as text
+        
+    Raises:
+        requests.RequestException: If the page cannot be fetched
+    """
+    headers = {
+        'User-Agent': USER_AGENT
+    }
+    
+    response = requests.get(url, headers=headers, timeout=HTTP_REQUEST_TIMEOUT)
+    response.raise_for_status()
+    
+    return response.text
+
 def _fetch_page_content(url: str) -> BeautifulSoup:
     """
     Fetch and parse the Wikipedia page content.
@@ -158,14 +186,7 @@ def _fetch_page_content(url: str) -> BeautifulSoup:
     Raises:
         Exception: If page cannot be fetched or parsed
     """
-    headers = {
-        'User-Agent': USER_AGENT.random
-    }
-    
-    response = requests.get(url, headers=headers, timeout=HTTP_REQUEST_TIMEOUT)
-    response.raise_for_status()
-    
-    return BeautifulSoup(response.content, 'html.parser')
+    return BeautifulSoup(_fetch_html(url), 'html.parser')
 
 def _locate_components_table(soup: BeautifulSoup) -> Optional[object]:
     """
@@ -327,7 +348,12 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
         # Locate the components table
         table = _locate_components_table(soup)
         if not table:
-            logger.error("No suitable table found with BeautifulSoup")
+            title = soup.title.get_text(strip=True) if soup.title else 'n/a'
+            wikitables = len(soup.find_all('table', class_='wikitable'))
+            logger.error(
+                f"No suitable table found with BeautifulSoup "
+                f"(page title: {title!r}, wikitables on page: {wikitables})"
+            )
             return None
         
         # Parse header row and determine column indices
@@ -531,3 +557,5 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Main program failed: {e}")
         print(f"Error: {e}")
+        # Non-zero exit code so that CI marks the run as failed
+        sys.exit(1)

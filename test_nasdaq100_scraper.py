@@ -198,13 +198,24 @@ class TestFetchPageContent:
     def test_fetch_page_content_success(self, mock_get):
         """Test successful page fetch."""
         mock_response = Mock()
-        mock_response.content = b'<html><body>Test</body></html>'
+        mock_response.text = '<html><body>Test</body></html>'
         mock_response.raise_for_status = Mock()
         mock_get.return_value = mock_response
 
         result = _fetch_page_content("https://test.com")
         assert isinstance(result, BeautifulSoup)
         assert mock_get.called
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_fetch_page_content_sends_descriptive_user_agent(self, mock_get):
+        """Wikimedia rejects generic User-Agents, so a descriptive one must be sent."""
+        mock_response = Mock()
+        mock_response.text = '<html></html>'
+        mock_get.return_value = mock_response
+
+        _fetch_page_content("https://test.com")
+        user_agent = mock_get.call_args.kwargs['headers']['User-Agent']
+        assert 'github.com/Gary-Strauss/NASDAQ100_Constituents' in user_agent
 
     @patch('nasdaq100_scraper.requests.get')
     def test_fetch_page_content_timeout(self, mock_get):
