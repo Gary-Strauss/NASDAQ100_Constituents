@@ -657,5 +657,59 @@ class TestSearchListArticles:
         assert _search_list_articles() == []
 
 
+
+def _components_html(headers, row):
+    """Build a wikitable with 100 rows; row(i) returns the cell texts of row i."""
+    def ticker(i):
+        return 'T' + chr(65 + i // 26) + chr(65 + i % 26)
+    head = ''.join(f'<th>{h}</th>' for h in headers)
+    body = ''.join(
+        '<tr>' + ''.join(f'<td>{cell}</td>' for cell in row(ticker(i), i)) + '</tr>'
+        for i in range(100)
+    )
+    return f'<table class="wikitable"><tr>{head}</tr>{body}</table>'
+
+
+class TestGetNasdaq100WithPandasColumns:
+    """Test column mapping of get_nasdaq100_with_pandas for different page layouts."""
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_industry_column_with_empty_logo_column(self, mock_fetch):
+        """An empty logo column is skipped and a single Industry column fills both fields."""
+        mock_fetch.return_value = _components_html(
+            ['Ticker', 'Company', 'Logo', 'Industry'],
+            lambda t, i: [t, f'Company {i}', '', 'Software'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert len(df) == 100
+        assert (df['GICS_Sector'] == 'Software').all()
+        assert (df['GICS_Sub_Industry'] == 'Software').all()
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_gics_columns(self, mock_fetch):
+        """Real GICS sector and sub-industry columns are mapped separately."""
+        mock_fetch.return_value = _components_html(
+            ['Company', 'Ticker', 'GICS Sector', 'GICS Sub-Industry'],
+            lambda t, i: [f'Company {i}', t, 'Information Technology', 'Semiconductors'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Information Technology').all()
+        assert (df['GICS_Sub_Industry'] == 'Semiconductors').all()
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_unnamed_classification_column(self, mock_fetch):
+        """Without any named classification column the non-empty fourth column is used."""
+        mock_fetch.return_value = _components_html(
+            ['Symbol', 'Name', 'Logo', 'Business'],
+            lambda t, i: [t, f'Company {i}', '', 'Biotechnology'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Biotechnology').all()
+        assert (df['GICS_Sub_Industry'] == 'Biotechnology').all()
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

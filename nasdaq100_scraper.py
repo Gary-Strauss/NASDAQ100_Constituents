@@ -197,52 +197,41 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
                 subsector_col = find_column_by_keywords(columns, ['sub-industry', 'gics sub', 'sub industry'])
                 
                 if ticker_col is not None and company_col is not None:
+                    logger.info(f"Components table columns: {columns}")
+                    
+                    # A plain "Industry" column serves as sector if no sector column exists
+                    if sector_col is None:
+                        sector_col = next(
+                            (i for i, col in enumerate(columns)
+                             if 'industry' in col.lower() and i != subsector_col),
+                            None
+                        )
+                    
+                    # Positional fallbacks, but never onto unrelated or empty columns
+                    used_cols = {ticker_col, company_col, sector_col, subsector_col}
+                    if sector_col is None and len(columns) > 2 and 2 not in used_cols \
+                            and _has_values(table.iloc[:, 2]):
+                        sector_col = 2
+                        used_cols.add(2)
+                    if subsector_col is None and len(columns) > 3 and 3 not in used_cols \
+                            and _has_values(table.iloc[:, 3]):
+                        subsector_col = 3
+                    
                     # Table found, standardize column names
-                    df = table.copy()
+                    df = pd.DataFrame({
+                        'Ticker': table.iloc[:, ticker_col],
+                        'Company': table.iloc[:, company_col],
+                        'GICS_Sector': table.iloc[:, sector_col] if sector_col is not None else '',
+                        'GICS_Sub_Industry': table.iloc[:, subsector_col] if subsector_col is not None else '',
+                    })
                     
-                    # Safe fallback for sector column
-                    sector_fallback = None
-                    if sector_col is None and len(columns) > 2:
-                        sector_fallback = columns[2]
+                    # With only one classification column, use it for both fields
+                    if sector_col is None and subsector_col is not None:
+                        df['GICS_Sector'] = df['GICS_Sub_Industry']
+                    elif subsector_col is None and sector_col is not None:
+                        df['GICS_Sub_Industry'] = df['GICS_Sector']
                     
-                    # Safe fallback for subsector column  
-                    subsector_fallback = None
-                    if subsector_col is None and len(columns) > 3:
-                        subsector_fallback = columns[3]
-                    
-                    rename_dict = {
-                        columns[ticker_col]: 'Ticker',
-                        columns[company_col]: 'Company'
-                    }
-                    
-                    # Add sector column if available
-                    if sector_col is not None:
-                        rename_dict[columns[sector_col]] = 'GICS_Sector'
-                    elif sector_fallback is not None:
-                        rename_dict[sector_fallback] = 'GICS_Sector'
-                    
-                    # Add subsector column if available
-                    if subsector_col is not None:
-                        rename_dict[columns[subsector_col]] = 'GICS_Sub_Industry'
-                    elif subsector_fallback is not None:
-                        rename_dict[subsector_fallback] = 'GICS_Sub_Industry'
-                    
-                    df = df.rename(columns=rename_dict)
-                    
-                    # Keep only the desired columns that exist
-                    available_columns = ['Ticker', 'Company']
-                    if 'GICS_Sector' in df.columns:
-                        available_columns.append('GICS_Sector')
-                    else:
-                        df['GICS_Sector'] = ''  # Add empty column if missing
-                        available_columns.append('GICS_Sector')
-                    
-                    if 'GICS_Sub_Industry' in df.columns:
-                        available_columns.append('GICS_Sub_Industry')
-                    else:
-                        df['GICS_Sub_Industry'] = ''  # Add empty column if missing
-                        available_columns.append('GICS_Sub_Industry')
-                    
+                    available_columns = ['Ticker', 'Company', 'GICS_Sector', 'GICS_Sub_Industry']
                     df = df[available_columns]
                     
                     # Clean data
@@ -491,6 +480,18 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
     except Exception as e:
         logger.error(f"Error with BeautifulSoup method: {e}")
         return None
+
+def _has_values(column: pd.Series) -> bool:
+    """
+    Check whether a table column contains any non-empty values.
+    
+    Args:
+        column: Table column
+        
+    Returns:
+        True if at least one cell has text
+    """
+    return column.dropna().astype(str).str.strip().ne('').any()
 
 def find_column_by_keywords(columns: List[str], keywords: List[str]) -> Optional[int]:
     """
