@@ -9,6 +9,7 @@ import re
 import os
 import sys
 from io import StringIO
+from urllib.parse import quote
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,6 +32,10 @@ MAX_EXPECTED_COMPONENTS = 110  # Maximum number of expected Nasdaq-100 component
 RETRY_BACKOFF_BASE = 2  # Base for exponential backoff calculation
 WIKIPEDIA_BASE_URL = "https://en.wikipedia.org"
 NASDAQ100_URL = f"{WIKIPEDIA_BASE_URL}/wiki/Nasdaq-100"
+WIKIPEDIA_API_URL = f"{WIKIPEDIA_BASE_URL}/w/api.php"
+# Title keywords that mark an article as a likely home of the components list
+LIST_ARTICLE_KEYWORDS = ['list', 'compan', 'component', 'constituent']
+MAX_SEARCH_RESULTS = 20  # Number of Wikipedia search hits to inspect
 
 def get_nasdaq100_components() -> pd.DataFrame:
     """
@@ -48,8 +53,13 @@ def get_nasdaq100_components() -> pd.DataFrame:
     if df is not None:
         return df
     
-    for list_url in _find_list_article_urls(NASDAQ100_URL):
-        logger.info(f"Trying linked list article: {list_url}")
+    candidate_urls = []
+    for list_url in _find_list_article_urls(NASDAQ100_URL) + _search_list_articles():
+        if list_url != NASDAQ100_URL and list_url not in candidate_urls:
+            candidate_urls.append(list_url)
+    
+    for list_url in candidate_urls:
+        logger.info(f"Trying list article: {list_url}")
         df = _get_components_from_url(list_url)
         if df is not None:
             return df
@@ -87,7 +97,7 @@ def _get_components_from_url(url: str) -> Optional[pd.DataFrame]:
 
 def _find_list_article_urls(url: str) -> List[str]:
     """
-    Find links to Nasdaq-100 list articles (e.g. "List of Nasdaq-100 companies").
+    Find links to Nasdaq list articles (e.g. "List of Nasdaq-100 companies").
     
     Args:
         url: Wikipedia URL of the index article
@@ -104,14 +114,51 @@ def _find_list_article_urls(url: str) -> List[str]:
     urls = []
     for link in soup.find_all('a', href=True):
         href = link['href'].split('#')[0]
-        if (href.startswith('/wiki/List_of')
-                and 'nasdaq' in href.lower()
-                and ':' not in href):
+        name = href[len('/wiki/'):].lower()
+        if (href.startswith('/wiki/')
+                and ':' not in href
+                and 'nasdaq' in name
+                and any(keyword in name for keyword in LIST_ARTICLE_KEYWORDS)):
             full_url = WIKIPEDIA_BASE_URL + href
             if full_url not in urls:
                 urls.append(full_url)
     
     logger.info(f"Linked list articles found: {urls or 'none'}")
+    return urls
+
+def _search_list_articles() -> List[str]:
+    """
+    Search Wikipedia for articles that may hold the Nasdaq-100 components list.
+    
+    Returns:
+        List of absolute URLs, empty if the search failed or found nothing
+    """
+    params = {
+        'action': 'query',
+        'list': 'search',
+        'srsearch': 'Nasdaq-100',
+        'srlimit': MAX_SEARCH_RESULTS,
+        'format': 'json',
+    }
+    try:
+        response = requests.get(WIKIPEDIA_API_URL, params=params,
+                                headers={'User-Agent': USER_AGENT},
+                                timeout=HTTP_REQUEST_TIMEOUT)
+        response.raise_for_status()
+        titles = [hit['title'] for hit in response.json()['query']['search']]
+    except Exception as e:
+        logger.warning(f"Wikipedia search failed: {e}")
+        return []
+    
+    logger.info(f"Wikipedia search results: {titles}")
+    
+    urls = []
+    for title in titles:
+        lower_title = title.lower()
+        if 'nasdaq' in lower_title and any(keyword in lower_title for keyword in LIST_ARTICLE_KEYWORDS):
+            urls.append(f"{WIKIPEDIA_BASE_URL}/wiki/{quote(title.replace(' ', '_'))}")
+    
+    logger.info(f"List articles found by search: {urls or 'none'}")
     return urls
 
 def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:

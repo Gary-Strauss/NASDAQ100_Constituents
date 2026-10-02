@@ -13,6 +13,7 @@ from nasdaq100_scraper import (
     validate_dataframe,
     _fetch_page_content,
     _find_list_article_urls,
+    _search_list_articles,
     _locate_components_table,
     _parse_header_row,
     _extract_table_data,
@@ -562,10 +563,11 @@ class TestGetNasdaq100Components:
         assert mock_pandas.called
         assert mock_bs.called
 
+    @patch('nasdaq100_scraper._search_list_articles', return_value=[])
     @patch('nasdaq100_scraper._find_list_article_urls', return_value=[])
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
-    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs, mock_find):
+    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs, mock_find, mock_search):
         """Test exception when both methods fail."""
         mock_pandas.return_value = None
         mock_bs.return_value = None
@@ -576,10 +578,11 @@ class TestGetNasdaq100Components:
         assert "Both methods failed" in str(exc_info.value)
 
 
+    @patch('nasdaq100_scraper._search_list_articles', return_value=[])
     @patch('nasdaq100_scraper._find_list_article_urls')
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
-    def test_get_components_follows_list_article(self, mock_pandas, mock_bs, mock_find):
+    def test_get_components_follows_list_article(self, mock_pandas, mock_bs, mock_find, mock_search):
         """Test that a linked list article is tried when the index article has no table."""
         list_url = 'https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies'
         mock_df = pd.DataFrame({
@@ -623,6 +626,35 @@ class TestFindListArticleUrls:
         mock_fetch.side_effect = requests.HTTPError("403")
 
         assert _find_list_article_urls('https://en.wikipedia.org/wiki/Nasdaq-100') == []
+
+
+
+class TestSearchListArticles:
+    """Test the _search_list_articles function."""
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_returns_matching_titles_as_urls(self, mock_get):
+        """Only Nasdaq titles that look like list articles are returned."""
+        mock_response = Mock()
+        mock_response.json.return_value = {'query': {'search': [
+            {'title': 'Nasdaq-100'},
+            {'title': 'List of Nasdaq-100 companies'},
+            {'title': 'Nasdaq Composite'},
+            {'title': 'List of S&P 500 companies'},
+        ]}}
+        mock_get.return_value = mock_response
+
+        result = _search_list_articles()
+
+        assert result == ['https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies']
+        assert 'github.com/Gary-Strauss' in mock_get.call_args.kwargs['headers']['User-Agent']
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_returns_empty_list_on_error(self, mock_get):
+        """A failed search yields no candidates instead of raising."""
+        mock_get.side_effect = requests.ConnectionError("down")
+
+        assert _search_list_articles() == []
 
 
 if __name__ == "__main__":
