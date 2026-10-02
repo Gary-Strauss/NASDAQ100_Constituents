@@ -12,6 +12,7 @@ from nasdaq100_scraper import (
     clean_dataframe,
     validate_dataframe,
     _fetch_page_content,
+    _find_list_article_urls,
     _locate_components_table,
     _parse_header_row,
     _extract_table_data,
@@ -561,9 +562,10 @@ class TestGetNasdaq100Components:
         assert mock_pandas.called
         assert mock_bs.called
 
+    @patch('nasdaq100_scraper._find_list_article_urls', return_value=[])
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
-    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs):
+    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs, mock_find):
         """Test exception when both methods fail."""
         mock_pandas.return_value = None
         mock_bs.return_value = None
@@ -572,6 +574,55 @@ class TestGetNasdaq100Components:
             get_nasdaq100_components()
 
         assert "Both methods failed" in str(exc_info.value)
+
+
+    @patch('nasdaq100_scraper._find_list_article_urls')
+    @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
+    @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
+    def test_get_components_follows_list_article(self, mock_pandas, mock_bs, mock_find):
+        """Test that a linked list article is tried when the index article has no table."""
+        list_url = 'https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies'
+        mock_df = pd.DataFrame({
+            'Ticker': ['AAPL'] * 100,
+            'Company': ['Apple'] * 100,
+            'GICS_Sector': ['IT'] * 100,
+            'GICS_Sub_Industry': ['Tech'] * 100
+        })
+        mock_pandas.side_effect = lambda url: mock_df if url == list_url else None
+        mock_bs.return_value = None
+        mock_find.return_value = [list_url]
+
+        result = get_nasdaq100_components()
+
+        assert len(result) == 100
+        mock_pandas.assert_called_with(list_url)
+
+
+class TestFindListArticleUrls:
+    """Test the _find_list_article_urls function."""
+
+    @patch('nasdaq100_scraper._fetch_page_content')
+    def test_finds_nasdaq_list_links(self, mock_fetch):
+        """Only Nasdaq list articles are returned, deduplicated and without anchors."""
+        mock_fetch.return_value = BeautifulSoup(
+            '<a href="/wiki/List_of_Nasdaq-100_companies">Main article</a>'
+            '<a href="/wiki/List_of_Nasdaq-100_companies#Components">again</a>'
+            '<a href="/wiki/List_of_S%26P_500_companies">S&P</a>'
+            '<a href="/wiki/Nasdaq">Nasdaq</a>'
+            '<a href="/wiki/Category:List_of_Nasdaq_things">category</a>',
+            'html.parser'
+        )
+
+        result = _find_list_article_urls('https://en.wikipedia.org/wiki/Nasdaq-100')
+
+        assert result == ['https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies']
+
+    @patch('nasdaq100_scraper._fetch_page_content')
+    def test_returns_empty_list_on_fetch_error(self, mock_fetch):
+        """A failed page fetch yields no candidates instead of raising."""
+        mock_fetch.side_effect = requests.HTTPError("403")
+
+        assert _find_list_article_urls('https://en.wikipedia.org/wiki/Nasdaq-100') == []
 
 
 if __name__ == "__main__":

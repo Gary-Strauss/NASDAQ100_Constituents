@@ -29,17 +29,43 @@ MIN_TABLE_ROWS = 50  # Minimum rows to consider a table as the components table
 MIN_EXPECTED_COMPONENTS = 90  # Minimum number of expected Nasdaq-100 components
 MAX_EXPECTED_COMPONENTS = 110  # Maximum number of expected Nasdaq-100 components
 RETRY_BACKOFF_BASE = 2  # Base for exponential backoff calculation
+WIKIPEDIA_BASE_URL = "https://en.wikipedia.org"
+NASDAQ100_URL = f"{WIKIPEDIA_BASE_URL}/wiki/Nasdaq-100"
 
 def get_nasdaq100_components() -> pd.DataFrame:
     """
     Main function to retrieve Nasdaq-100 components from Wikipedia.
     Uses pandas.read_html() as primary method with BeautifulSoup as fallback.
     
+    The index article is tried first. If it no longer contains the components
+    table, the "List of ..." articles it links to are tried, since Wikipedia
+    has started moving constituent lists into separate list articles.
+    
     Returns:
         pandas.DataFrame: DataFrame with Ticker, Company, GICS_Sector, GICS_Sub_Industry
     """
-    url = "https://en.wikipedia.org/wiki/Nasdaq-100"
+    df = _get_components_from_url(NASDAQ100_URL)
+    if df is not None:
+        return df
     
+    for list_url in _find_list_article_urls(NASDAQ100_URL):
+        logger.info(f"Trying linked list article: {list_url}")
+        df = _get_components_from_url(list_url)
+        if df is not None:
+            return df
+    
+    raise Exception("Both methods failed - could not retrieve Nasdaq-100 components")
+
+def _get_components_from_url(url: str) -> Optional[pd.DataFrame]:
+    """
+    Try both extraction methods on a single page.
+    
+    Args:
+        url: Wikipedia URL
+        
+    Returns:
+        pandas.DataFrame or None if no components table was found
+    """
     try:
         # Primary method: pandas.read_html()
         logger.info("Trying to retrieve data with pandas.read_html()...")
@@ -57,7 +83,36 @@ def get_nasdaq100_components() -> pd.DataFrame:
         logger.info(f"Successfully retrieved {len(df)} components with BeautifulSoup")
         return df
     
-    raise Exception("Both methods failed - could not retrieve Nasdaq-100 components")
+    return None
+
+def _find_list_article_urls(url: str) -> List[str]:
+    """
+    Find links to Nasdaq-100 list articles (e.g. "List of Nasdaq-100 companies").
+    
+    Args:
+        url: Wikipedia URL of the index article
+        
+    Returns:
+        List of absolute URLs, empty if none were found or the page failed to load
+    """
+    try:
+        soup = _fetch_page_content(url)
+    except Exception as e:
+        logger.warning(f"Could not search for list articles: {e}")
+        return []
+    
+    urls = []
+    for link in soup.find_all('a', href=True):
+        href = link['href'].split('#')[0]
+        if (href.startswith('/wiki/List_of')
+                and 'nasdaq' in href.lower()
+                and ':' not in href):
+            full_url = WIKIPEDIA_BASE_URL + href
+            if full_url not in urls:
+                urls.append(full_url)
+    
+    logger.info(f"Linked list articles found: {urls or 'none'}")
+    return urls
 
 def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     """
@@ -349,11 +404,16 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
         table = _locate_components_table(soup)
         if not table:
             title = soup.title.get_text(strip=True) if soup.title else 'n/a'
-            wikitables = len(soup.find_all('table', class_='wikitable'))
+            wikitables = soup.find_all('table', class_='wikitable')
             logger.error(
                 f"No suitable table found with BeautifulSoup "
-                f"(page title: {title!r}, wikitables on page: {wikitables})"
+                f"(page title: {title!r}, wikitables on page: {len(wikitables)})"
             )
+            for i, wikitable in enumerate(wikitables, 1):
+                first_row = wikitable.find('tr')
+                headers = [c.get_text(strip=True) for c in first_row.find_all(['th', 'td'])] if first_row else []
+                rows = len(wikitable.find_all('tr'))
+                logger.info(f"  wikitable {i}: {rows} rows, headers {headers}")
             return None
         
         # Parse header row and determine column indices
