@@ -12,6 +12,8 @@ from nasdaq100_scraper import (
     clean_dataframe,
     validate_dataframe,
     _fetch_page_content,
+    _find_list_article_urls,
+    _search_list_articles,
     _locate_components_table,
     _parse_header_row,
     _extract_table_data,
@@ -198,13 +200,24 @@ class TestFetchPageContent:
     def test_fetch_page_content_success(self, mock_get):
         """Test successful page fetch."""
         mock_response = Mock()
-        mock_response.content = b'<html><body>Test</body></html>'
+        mock_response.text = '<html><body>Test</body></html>'
         mock_response.raise_for_status = Mock()
         mock_get.return_value = mock_response
 
         result = _fetch_page_content("https://test.com")
         assert isinstance(result, BeautifulSoup)
         assert mock_get.called
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_fetch_page_content_sends_descriptive_user_agent(self, mock_get):
+        """Wikimedia rejects generic User-Agents, so a descriptive one must be sent."""
+        mock_response = Mock()
+        mock_response.text = '<html></html>'
+        mock_get.return_value = mock_response
+
+        _fetch_page_content("https://test.com")
+        user_agent = mock_get.call_args.kwargs['headers']['User-Agent']
+        assert 'github.com/Gary-Strauss/NASDAQ100_Constituents' in user_agent
 
     @patch('nasdaq100_scraper.requests.get')
     def test_fetch_page_content_timeout(self, mock_get):
@@ -529,7 +542,7 @@ class TestGetNasdaq100Components:
         result = get_nasdaq100_components()
 
         assert len(result) == 100
-        assert mock_pandas.called
+        mock_pandas.assert_called_once_with('https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies')
 
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
@@ -550,9 +563,11 @@ class TestGetNasdaq100Components:
         assert mock_pandas.called
         assert mock_bs.called
 
+    @patch('nasdaq100_scraper._search_list_articles', return_value=[])
+    @patch('nasdaq100_scraper._find_list_article_urls', return_value=[])
     @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
     @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
-    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs):
+    def test_get_components_both_methods_fail(self, mock_pandas, mock_bs, mock_find, mock_search):
         """Test exception when both methods fail."""
         mock_pandas.return_value = None
         mock_bs.return_value = None
@@ -561,6 +576,139 @@ class TestGetNasdaq100Components:
             get_nasdaq100_components()
 
         assert "Both methods failed" in str(exc_info.value)
+
+
+    @patch('nasdaq100_scraper._search_list_articles', return_value=[])
+    @patch('nasdaq100_scraper._find_list_article_urls')
+    @patch('nasdaq100_scraper.get_nasdaq100_with_beautifulsoup')
+    @patch('nasdaq100_scraper.get_nasdaq100_with_pandas')
+    def test_get_components_follows_list_article(self, mock_pandas, mock_bs, mock_find, mock_search):
+        """Test that a linked list article is tried when the index article has no table."""
+        list_url = 'https://en.wikipedia.org/wiki/Nasdaq-100_components'
+        mock_df = pd.DataFrame({
+            'Ticker': ['AAPL'] * 100,
+            'Company': ['Apple'] * 100,
+            'GICS_Sector': ['IT'] * 100,
+            'GICS_Sub_Industry': ['Tech'] * 100
+        })
+        mock_pandas.side_effect = lambda url: mock_df if url == list_url else None
+        mock_bs.return_value = None
+        mock_find.return_value = [list_url]
+
+        result = get_nasdaq100_components()
+
+        assert len(result) == 100
+        mock_pandas.assert_called_with(list_url)
+
+
+class TestFindListArticleUrls:
+    """Test the _find_list_article_urls function."""
+
+    @patch('nasdaq100_scraper._fetch_page_content')
+    def test_finds_nasdaq_list_links(self, mock_fetch):
+        """Only Nasdaq list articles are returned, deduplicated and without anchors."""
+        mock_fetch.return_value = BeautifulSoup(
+            '<a href="/wiki/List_of_Nasdaq-100_companies">Main article</a>'
+            '<a href="/wiki/List_of_Nasdaq-100_companies#Components">again</a>'
+            '<a href="/wiki/List_of_S%26P_500_companies">S&P</a>'
+            '<a href="/wiki/Nasdaq">Nasdaq</a>'
+            '<a href="/wiki/Category:List_of_Nasdaq_things">category</a>',
+            'html.parser'
+        )
+
+        result = _find_list_article_urls('https://en.wikipedia.org/wiki/Nasdaq-100')
+
+        assert result == ['https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies']
+
+    @patch('nasdaq100_scraper._fetch_page_content')
+    def test_returns_empty_list_on_fetch_error(self, mock_fetch):
+        """A failed page fetch yields no candidates instead of raising."""
+        mock_fetch.side_effect = requests.HTTPError("403")
+
+        assert _find_list_article_urls('https://en.wikipedia.org/wiki/Nasdaq-100') == []
+
+
+
+class TestSearchListArticles:
+    """Test the _search_list_articles function."""
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_returns_matching_titles_as_urls(self, mock_get):
+        """Only Nasdaq titles that look like list articles are returned."""
+        mock_response = Mock()
+        mock_response.json.return_value = {'query': {'search': [
+            {'title': 'Nasdaq-100'},
+            {'title': 'List of Nasdaq-100 companies'},
+            {'title': 'Nasdaq Composite'},
+            {'title': 'List of S&P 500 companies'},
+        ]}}
+        mock_get.return_value = mock_response
+
+        result = _search_list_articles()
+
+        assert result == ['https://en.wikipedia.org/wiki/List_of_Nasdaq-100_companies']
+        assert 'github.com/Gary-Strauss' in mock_get.call_args.kwargs['headers']['User-Agent']
+
+    @patch('nasdaq100_scraper.requests.get')
+    def test_returns_empty_list_on_error(self, mock_get):
+        """A failed search yields no candidates instead of raising."""
+        mock_get.side_effect = requests.ConnectionError("down")
+
+        assert _search_list_articles() == []
+
+
+
+def _components_html(headers, row):
+    """Build a wikitable with 100 rows; row(i) returns the cell texts of row i."""
+    def ticker(i):
+        return 'T' + chr(65 + i // 26) + chr(65 + i % 26)
+    head = ''.join(f'<th>{h}</th>' for h in headers)
+    body = ''.join(
+        '<tr>' + ''.join(f'<td>{cell}</td>' for cell in row(ticker(i), i)) + '</tr>'
+        for i in range(100)
+    )
+    return f'<table class="wikitable"><tr>{head}</tr>{body}</table>'
+
+
+class TestGetNasdaq100WithPandasColumns:
+    """Test column mapping of get_nasdaq100_with_pandas for different page layouts."""
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_industry_column_with_empty_logo_column(self, mock_fetch):
+        """An empty logo column is skipped and a single Industry column fills both fields."""
+        mock_fetch.return_value = _components_html(
+            ['Ticker', 'Company', 'Logo', 'Industry'],
+            lambda t, i: [t, f'Company {i}', '', 'Software'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert len(df) == 100
+        assert (df['GICS_Sector'] == 'Software').all()
+        assert (df['GICS_Sub_Industry'] == 'Software').all()
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_gics_columns(self, mock_fetch):
+        """Real GICS sector and sub-industry columns are mapped separately."""
+        mock_fetch.return_value = _components_html(
+            ['Company', 'Ticker', 'GICS Sector', 'GICS Sub-Industry'],
+            lambda t, i: [f'Company {i}', t, 'Information Technology', 'Semiconductors'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Information Technology').all()
+        assert (df['GICS_Sub_Industry'] == 'Semiconductors').all()
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_unnamed_classification_column(self, mock_fetch):
+        """Without any named classification column the non-empty fourth column is used."""
+        mock_fetch.return_value = _components_html(
+            ['Symbol', 'Name', 'Logo', 'Business'],
+            lambda t, i: [t, f'Company {i}', '', 'Biotechnology'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Biotechnology').all()
+        assert (df['GICS_Sub_Industry'] == 'Biotechnology').all()
 
 
 if __name__ == "__main__":

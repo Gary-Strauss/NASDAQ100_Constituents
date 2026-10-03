@@ -53,11 +53,11 @@ The tool will automatically:
 
 ### Automated Updates via GitHub Actions
 
-This repository automatically updates the NASDAQ-100 data monthly using GitHub Actions:
+This repository automatically updates the NASDAQ-100 data weekly using GitHub Actions:
 
-- **Schedule**: 1st of every month at 10:00 UTC
+- **Schedule**: Every Sunday at 06:00 UTC
 - **Manual trigger**: Available via GitHub Actions tab
-- **Automatic releases**: Creates tagged releases when data changes
+- **Check date**: Each successful run writes its UTC timestamp to `data/last_checked.txt`, so you can see how current the data is even when the constituents did not change
 
 #### Access Current Data
 
@@ -65,12 +65,12 @@ You can directly access the latest data from GitHub:
 
 **CSV Format:**
 ```
-https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.csv
+https://raw.githubusercontent.com/Gary-Strauss/NASDAQ100_Constituents/master/data/nasdaq100_constituents.csv
 ```
 
 **JSON Format:**
 ```
-https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.json
+https://raw.githubusercontent.com/Gary-Strauss/NASDAQ100_Constituents/master/data/nasdaq100_constituents.json
 ```
 
 #### Programmatic Usage
@@ -80,11 +80,11 @@ import pandas as pd
 import requests
 
 # Load latest CSV data directly from GitHub
-csv_url = "https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.csv"
+csv_url = "https://raw.githubusercontent.com/Gary-Strauss/NASDAQ100_Constituents/master/data/nasdaq100_constituents.csv"
 df = pd.read_csv(csv_url)
 
 # Or load JSON data
-json_url = "https://raw.githubusercontent.com/Gary-Strauss/nasdaq100-scraper/main/data/nasdaq100_constituents.json"
+json_url = "https://raw.githubusercontent.com/Gary-Strauss/NASDAQ100_Constituents/master/data/nasdaq100_constituents.json"
 response = requests.get(json_url)
 data = response.json()
 ```
@@ -93,6 +93,7 @@ data = response.json()
 
 - **CSV format** (`data/nasdaq100_constituents.csv`): Tabular representation for Excel/spreadsheet programs
 - **JSON format** (`data/nasdaq100_constituents.json`): Structured data for programmatic use
+- **Check date** (`data/last_checked.txt`): UTC timestamp of the last successful data check
 
 ## Data Structure
 
@@ -139,7 +140,7 @@ The tool currently extracts 101 companies, including:
 
 ### Data Sources
 The data is retrieved from the Wikipedia "NASDAQ-100" page:
-- **Primary Source**: [Wikipedia - NASDAQ-100](https://en.wikipedia.org/wiki/Nasdaq-100)
+- **Primary Source**: [Wikipedia - List of NASDAQ-100 companies](https://en.wikipedia.org/wiki/List_of_NASDAQ-100_companies) (with fallbacks to the [Nasdaq-100 article](https://en.wikipedia.org/wiki/Nasdaq-100) and a Wikipedia search)
 - **Original Data Source**: Wikipedia references the official NASDAQ composition from [NASDAQ NDX Index](https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index) (as of 2025-06-22)
 - **License**: Wikipedia content is available under the [Creative Commons Attribution-ShareAlike License 3.0 (CC BY-SA 3.0)](https://creativecommons.org/licenses/by-sa/3.0/)
 
@@ -190,7 +191,8 @@ nasdaq100-scraper/
 ├── README.md                     # This file
 └── data/                         # Output directory
     ├── nasdaq100_constituents.csv
-    └── nasdaq100_constituents.json
+    ├── nasdaq100_constituents.json
+    └── last_checked.txt
 ```
 
 ## Contributing

@@ -17,10 +17,10 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
       
@@ -33,6 +33,13 @@ jobs:
         run: |
           python nasdaq100_scraper.py
       
+      - name: Record check date
+        # Hält fest, wann die Liste zuletzt erfolgreich geprüft wurde.
+        # Der wöchentliche Commit verhindert zugleich, dass GitHub den
+        # geplanten Workflow nach 60 Tagen ohne Commit deaktiviert.
+        run: |
+          date -u +'%Y-%m-%dT%H:%M:%SZ' > data/last_checked.txt
+
       - name: Commit and push changes if any
         run: |
           # Prüfen, ob es Änderungen gibt, bevor wir fortfahren
@@ -47,5 +54,9 @@ jobs:
           
           # Änderungen hinzufügen, committen und direkt pushen
           git add data/
-          git commit -m "chore: Update NASDAQ-100 data $(date +'%Y-%m-%d')"
+          if git diff --cached --quiet -- data/nasdaq100_constituents.csv data/nasdaq100_constituents.json; then
+            git commit -m "chore: Record NASDAQ-100 check $(date +'%Y-%m-%d')"
+          else
+            git commit -m "chore: Update NASDAQ-100 data $(date +'%Y-%m-%d')"
+          fi
           git push

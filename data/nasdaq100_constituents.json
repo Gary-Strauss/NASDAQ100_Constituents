@@ -2,8 +2,8 @@
   {
     "Ticker":"ADBE",
     "Company":"Adobe Inc.",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"AMD",
@@ -26,14 +26,14 @@
   {
     "Ticker":"GOOGL",
     "Company":"Alphabet Inc. (Class A)",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"GOOG",
     "Company":"Alphabet Inc. (Class C)",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"AMZN",
@@ -62,8 +62,8 @@
   {
     "Ticker":"AAPL",
     "Company":"Apple Inc.",
-    "GICS_Sector":"Computer Manufacturing",
-    "GICS_Sub_Industry":"Computer Manufacturing"
+    "GICS_Sector":"Computer Hardware",
+    "GICS_Sub_Industry":"Computer Hardware"
   },
   {
     "Ticker":"AMAT",
@@ -74,8 +74,8 @@
   {
     "Ticker":"APP",
     "Company":"AppLovin",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"ARM",
@@ -90,16 +90,16 @@
     "GICS_Sub_Industry":"Industrial Machinery"
   },
   {
-    "Ticker":"TEAM",
-    "Company":"Atlassian",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "Ticker":"ALAB",
+    "Company":"Astera Labs",
+    "GICS_Sector":"Semiconductors",
+    "GICS_Sub_Industry":"Semiconductors"
   },
   {
     "Ticker":"ADSK",
     "Company":"Autodesk",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"ADP",
@@ -134,14 +134,8 @@
   {
     "Ticker":"CDNS",
     "Company":"Cadence Design Systems",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
-  },
-  {
-    "Ticker":"CHTR",
-    "Company":"Charter Communications",
-    "GICS_Sector":"Cable & Other Pay Television Services",
-    "GICS_Sub_Industry":"Cable & Other Pay Television Services"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"CTAS",
@@ -162,12 +156,6 @@
     "GICS_Sub_Industry":"Soft Drinks"
   },
   {
-    "Ticker":"CTSH",
-    "Company":"Cognizant",
-    "GICS_Sector":"EDP Services",
-    "GICS_Sub_Industry":"EDP Services"
-  },
-  {
     "Ticker":"CMCSA",
     "Company":"Comcast",
     "GICS_Sector":"Cable & Other Pay Television Services",
@@ -186,10 +174,10 @@
     "GICS_Sub_Industry":"Retail"
   },
   {
-    "Ticker":"CSGP",
-    "Company":"CoStar Group",
-    "GICS_Sector":"Real Estate",
-    "GICS_Sub_Industry":"Real Estate"
+    "Ticker":"CRWV",
+    "Company":"CoreWeave",
+    "GICS_Sector":"Computer Services",
+    "GICS_Sub_Industry":"Computer Services"
   },
   {
     "Ticker":"COST",
@@ -200,8 +188,8 @@
   {
     "Ticker":"CRWD",
     "Company":"CrowdStrike",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"CSX",
@@ -212,8 +200,8 @@
   {
     "Ticker":"DDOG",
     "Company":"Datadog",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"DXCM",
@@ -230,14 +218,8 @@
   {
     "Ticker":"DASH",
     "Company":"DoorDash",
-    "GICS_Sector":"EDP Services",
-    "GICS_Sub_Industry":"EDP Services"
-  },
-  {
-    "Ticker":"EA",
-    "Company":"Electronic Arts",
-    "GICS_Sector":"Miscellaneous Amusement & Recreation Services",
-    "GICS_Sub_Industry":"Miscellaneous Amusement & Recreation Services"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"EXC",
@@ -276,20 +258,20 @@
     "GICS_Sub_Industry":"Biotechnology"
   },
   {
-    "Ticker":"HON",
-    "Company":"Honeywell",
+    "Ticker":"HONA",
+    "Company":"Honeywell Aerospace",
     "GICS_Sector":"Aerospace",
     "GICS_Sub_Industry":"Aerospace"
   },
   {
-    "Ticker":"IDXX",
-    "Company":"Idexx Laboratories",
-    "GICS_Sector":"Biotechnology",
-    "GICS_Sub_Industry":"Biotechnology"
+    "Ticker":"HON",
+    "Company":"Honeywell Technologies",
+    "GICS_Sector":"Diversified Industrials",
+    "GICS_Sub_Industry":"Diversified Industrials"
   },
   {
-    "Ticker":"INSM",
-    "Company":"Insmed Incorporated",
+    "Ticker":"IDXX",
+    "Company":"Idexx Laboratories",
     "GICS_Sector":"Biotechnology",
     "GICS_Sub_Industry":"Biotechnology"
   },
@@ -324,12 +306,6 @@
     "GICS_Sub_Industry":"Electronic Components"
   },
   {
-    "Ticker":"KHC",
-    "Company":"Kraft Heinz",
-    "GICS_Sector":"Packaged Foods",
-    "GICS_Sub_Industry":"Packaged Foods"
-  },
-  {
     "Ticker":"LRCX",
     "Company":"Lam Research",
     "GICS_Sector":"Industrial Machinery",
@@ -340,6 +316,12 @@
     "Company":"Linde plc",
     "GICS_Sector":"Major Chemicals",
     "GICS_Sub_Industry":"Major Chemicals"
+  },
+  {
+    "Ticker":"LITE",
+    "Company":"Lumentum",
+    "GICS_Sector":"Communication Equipment",
+    "GICS_Sub_Industry":"Communication Equipment"
   },
   {
     "Ticker":"MAR",
@@ -362,8 +344,8 @@
   {
     "Ticker":"META",
     "Company":"Meta Platforms",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"MCHP",
@@ -380,14 +362,14 @@
   {
     "Ticker":"MSFT",
     "Company":"Microsoft",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"MSTR",
     "Company":"MicroStrategy",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"MDLZ",
@@ -406,6 +388,12 @@
     "Company":"Monster Beverage",
     "GICS_Sector":"Soft Drinks",
     "GICS_Sub_Industry":"Soft Drinks"
+  },
+  {
+    "Ticker":"NBIS",
+    "Company":"Nebius Group",
+    "GICS_Sector":"Computer Services",
+    "GICS_Sub_Industry":"Computer Services"
   },
   {
     "Ticker":"NFLX",
@@ -428,14 +416,14 @@
   {
     "Ticker":"ORLY",
     "Company":"O'Reilly Automotive",
-    "GICS_Sector":"Auto & Home Supply Stores",
-    "GICS_Sub_Industry":"Auto & Home Supply Stores"
+    "GICS_Sector":"Specialty Retailers",
+    "GICS_Sub_Industry":"Specialty Retailers"
   },
   {
     "Ticker":"ODFL",
     "Company":"Old Dominion Freight Line",
-    "GICS_Sector":"Trucking Freight\/Courier Services",
-    "GICS_Sub_Industry":"Trucking Freight\/Courier Services"
+    "GICS_Sector":"Trucking",
+    "GICS_Sub_Industry":"Trucking"
   },
   {
     "Ticker":"PCAR",
@@ -446,8 +434,8 @@
   {
     "Ticker":"PLTR",
     "Company":"Palantir Technologies",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"PANW",
@@ -482,8 +470,8 @@
   {
     "Ticker":"QCOM",
     "Company":"Qualcomm",
-    "GICS_Sector":"Broadcasting & Communications Equipment",
-    "GICS_Sub_Industry":"Broadcasting & Communications Equipment"
+    "GICS_Sector":"Semiconductors",
+    "GICS_Sub_Industry":"Semiconductors"
   },
   {
     "Ticker":"REGN",
@@ -492,16 +480,28 @@
     "GICS_Sub_Industry":"Biotechnology"
   },
   {
+    "Ticker":"RKLB",
+    "Company":"Rocket Lab",
+    "GICS_Sector":"Aerospace",
+    "GICS_Sub_Industry":"Aerospace"
+  },
+  {
     "Ticker":"ROP",
     "Company":"Roper Technologies",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"ROST",
     "Company":"Ross Stores",
     "GICS_Sector":"Clothing\/Shoe\/Accessory Stores",
     "GICS_Sub_Industry":"Clothing\/Shoe\/Accessory Stores"
+  },
+  {
+    "Ticker":"SNDK",
+    "Company":"Sandisk",
+    "GICS_Sector":"Electronic Components",
+    "GICS_Sub_Industry":"Electronic Components"
   },
   {
     "Ticker":"STX",
@@ -512,8 +512,14 @@
   {
     "Ticker":"SHOP",
     "Company":"Shopify",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
+  },
+  {
+    "Ticker":"SPCX",
+    "Company":"SpaceX",
+    "GICS_Sector":"Telecommunications Services",
+    "GICS_Sub_Industry":"Telecommunications Services"
   },
   {
     "Ticker":"SBUX",
@@ -524,20 +530,26 @@
   {
     "Ticker":"SNPS",
     "Company":"Synopsys",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"TMUS",
     "Company":"T-Mobile US",
-    "GICS_Sector":"Telecommunications Service Providers",
-    "GICS_Sub_Industry":"Telecommunications Service Providers"
+    "GICS_Sector":"Telecommunications Services",
+    "GICS_Sub_Industry":"Telecommunications Services"
   },
   {
     "Ticker":"TTWO",
     "Company":"Take-Two Interactive",
     "GICS_Sector":"Miscellaneous Amusement & Recreation Services",
     "GICS_Sub_Industry":"Miscellaneous Amusement & Recreation Services"
+  },
+  {
+    "Ticker":"TER",
+    "Company":"Teradyne",
+    "GICS_Sector":"Semiconductors",
+    "GICS_Sub_Industry":"Semiconductors"
   },
   {
     "Ticker":"TSLA",
@@ -554,14 +566,8 @@
   {
     "Ticker":"TRI",
     "Company":"Thomson Reuters",
-    "GICS_Sector":"Computer Software",
-    "GICS_Sub_Industry":"Computer Software"
-  },
-  {
-    "Ticker":"VRSK",
-    "Company":"Verisk Analytics",
-    "GICS_Sector":"Diversified Commercial Services",
-    "GICS_Sub_Industry":"Diversified Commercial Services"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"VRTX",
@@ -578,8 +584,8 @@
   {
     "Ticker":"WBD",
     "Company":"Warner Bros. Discovery",
-    "GICS_Sector":"Miscellaneous Amusement & Recreation Services",
-    "GICS_Sub_Industry":"Miscellaneous Amusement & Recreation Services"
+    "GICS_Sector":"Entertainment",
+    "GICS_Sub_Industry":"Entertainment"
   },
   {
     "Ticker":"WDC",
@@ -590,19 +596,13 @@
   {
     "Ticker":"WDAY",
     "Company":"Workday, Inc.",
-    "GICS_Sector":"EDP Services",
-    "GICS_Sub_Industry":"EDP Services"
+    "GICS_Sector":"Software",
+    "GICS_Sub_Industry":"Software"
   },
   {
     "Ticker":"XEL",
     "Company":"Xcel Energy",
-    "GICS_Sector":"Power Generation",
-    "GICS_Sub_Industry":"Power Generation"
-  },
-  {
-    "Ticker":"ZS",
-    "Company":"Zscaler",
-    "GICS_Sector":"EDP Services",
-    "GICS_Sub_Industry":"EDP Services"
+    "GICS_Sector":"Conventional Electricity",
+    "GICS_Sub_Industry":"Conventional Electricity"
   }
 ]

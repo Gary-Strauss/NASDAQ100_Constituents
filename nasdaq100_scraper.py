@@ -7,14 +7,22 @@ import logging
 from typing import Optional, List, Dict
 import re
 import os
-from fake_useragent import UserAgent
+import sys
+from io import StringIO
+from urllib.parse import quote
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# User-Agent generator for consistent usage across functions
-USER_AGENT = UserAgent()
+# Descriptive User-Agent as required by the Wikimedia User-Agent policy
+# (https://foundation.wikimedia.org/wiki/Policy:Wikimedia_Foundation_User-Agent_Policy).
+# Generic or spoofed browser User-Agents are rejected with HTTP 403.
+USER_AGENT = (
+    "NASDAQ100ConstituentsBot/1.0 "
+    "(https://github.com/Gary-Strauss/NASDAQ100_Constituents) "
+    f"python-requests/{requests.__version__}"
+)
 
 # Configuration constants
 HTTP_REQUEST_TIMEOUT = 30  # Timeout in seconds for HTTP requests
@@ -22,17 +30,58 @@ MIN_TABLE_ROWS = 50  # Minimum rows to consider a table as the components table
 MIN_EXPECTED_COMPONENTS = 90  # Minimum number of expected Nasdaq-100 components
 MAX_EXPECTED_COMPONENTS = 110  # Maximum number of expected Nasdaq-100 components
 RETRY_BACKOFF_BASE = 2  # Base for exponential backoff calculation
+WIKIPEDIA_BASE_URL = "https://en.wikipedia.org"
+NASDAQ100_URL = f"{WIKIPEDIA_BASE_URL}/wiki/Nasdaq-100"
+# The components table moved out of the index article into this list article
+NASDAQ100_LIST_URL = f"{WIKIPEDIA_BASE_URL}/wiki/List_of_NASDAQ-100_companies"
+WIKIPEDIA_API_URL = f"{WIKIPEDIA_BASE_URL}/w/api.php"
+# Title keywords that mark an article as a likely home of the components list
+LIST_ARTICLE_KEYWORDS = ['list', 'compan', 'component', 'constituent']
+MAX_SEARCH_RESULTS = 20  # Number of Wikipedia search hits to inspect
 
 def get_nasdaq100_components() -> pd.DataFrame:
     """
     Main function to retrieve Nasdaq-100 components from Wikipedia.
     Uses pandas.read_html() as primary method with BeautifulSoup as fallback.
     
+    The list article is tried first, then the index article. If neither
+    contains the components table, list articles linked from the index
+    article or found via the Wikipedia search are tried, in case the list
+    moves again.
+    
     Returns:
         pandas.DataFrame: DataFrame with Ticker, Company, GICS_Sector, GICS_Sub_Industry
     """
-    url = "https://en.wikipedia.org/wiki/Nasdaq-100"
+    for url in [NASDAQ100_LIST_URL, NASDAQ100_URL]:
+        logger.info(f"Trying article: {url}")
+        df = _get_components_from_url(url)
+        if df is not None:
+            return df
     
+    known_urls = [NASDAQ100_LIST_URL.lower(), NASDAQ100_URL.lower()]
+    candidate_urls = []
+    for list_url in _find_list_article_urls(NASDAQ100_URL) + _search_list_articles():
+        if list_url.lower() not in known_urls and list_url not in candidate_urls:
+            candidate_urls.append(list_url)
+    
+    for list_url in candidate_urls:
+        logger.info(f"Trying list article: {list_url}")
+        df = _get_components_from_url(list_url)
+        if df is not None:
+            return df
+    
+    raise Exception("Both methods failed - could not retrieve Nasdaq-100 components")
+
+def _get_components_from_url(url: str) -> Optional[pd.DataFrame]:
+    """
+    Try both extraction methods on a single page.
+    
+    Args:
+        url: Wikipedia URL
+        
+    Returns:
+        pandas.DataFrame or None if no components table was found
+    """
     try:
         # Primary method: pandas.read_html()
         logger.info("Trying to retrieve data with pandas.read_html()...")
@@ -50,7 +99,73 @@ def get_nasdaq100_components() -> pd.DataFrame:
         logger.info(f"Successfully retrieved {len(df)} components with BeautifulSoup")
         return df
     
-    raise Exception("Both methods failed - could not retrieve Nasdaq-100 components")
+    return None
+
+def _find_list_article_urls(url: str) -> List[str]:
+    """
+    Find links to Nasdaq list articles (e.g. "List of Nasdaq-100 companies").
+    
+    Args:
+        url: Wikipedia URL of the index article
+        
+    Returns:
+        List of absolute URLs, empty if none were found or the page failed to load
+    """
+    try:
+        soup = _fetch_page_content(url)
+    except Exception as e:
+        logger.warning(f"Could not search for list articles: {e}")
+        return []
+    
+    urls = []
+    for link in soup.find_all('a', href=True):
+        href = link['href'].split('#')[0]
+        name = href[len('/wiki/'):].lower()
+        if (href.startswith('/wiki/')
+                and ':' not in href
+                and 'nasdaq' in name
+                and any(keyword in name for keyword in LIST_ARTICLE_KEYWORDS)):
+            full_url = WIKIPEDIA_BASE_URL + href
+            if full_url not in urls:
+                urls.append(full_url)
+    
+    logger.info(f"Linked list articles found: {urls or 'none'}")
+    return urls
+
+def _search_list_articles() -> List[str]:
+    """
+    Search Wikipedia for articles that may hold the Nasdaq-100 components list.
+    
+    Returns:
+        List of absolute URLs, empty if the search failed or found nothing
+    """
+    params = {
+        'action': 'query',
+        'list': 'search',
+        'srsearch': 'Nasdaq-100',
+        'srlimit': MAX_SEARCH_RESULTS,
+        'format': 'json',
+    }
+    try:
+        response = requests.get(WIKIPEDIA_API_URL, params=params,
+                                headers={'User-Agent': USER_AGENT},
+                                timeout=HTTP_REQUEST_TIMEOUT)
+        response.raise_for_status()
+        titles = [hit['title'] for hit in response.json()['query']['search']]
+    except Exception as e:
+        logger.warning(f"Wikipedia search failed: {e}")
+        return []
+    
+    logger.info(f"Wikipedia search results: {titles}")
+    
+    urls = []
+    for title in titles:
+        lower_title = title.lower()
+        if 'nasdaq' in lower_title and any(keyword in lower_title for keyword in LIST_ARTICLE_KEYWORDS):
+            urls.append(f"{WIKIPEDIA_BASE_URL}/wiki/{quote(title.replace(' ', '_'))}")
+    
+    logger.info(f"List articles found by search: {urls or 'none'}")
+    return urls
 
 def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     """
@@ -62,13 +177,12 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
     Returns:
         pandas.DataFrame or None on error
     """
-    headers = {
-        'User-Agent': USER_AGENT.random
-    }
-    
     try:
+        # Fetch the page ourselves so the required User-Agent header is sent
+        html = _fetch_html(url)
+        
         # Read all tables from the page
-        tables = pd.read_html(url, header=0, attrs={'class': 'wikitable'})
+        tables = pd.read_html(StringIO(html), header=0, attrs={'class': 'wikitable'})
         
         # Search for the Components table
         for table in tables:
@@ -83,52 +197,41 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
                 subsector_col = find_column_by_keywords(columns, ['sub-industry', 'gics sub', 'sub industry'])
                 
                 if ticker_col is not None and company_col is not None:
+                    logger.info(f"Components table columns: {columns}")
+                    
+                    # A plain "Industry" column serves as sector if no sector column exists
+                    if sector_col is None:
+                        sector_col = next(
+                            (i for i, col in enumerate(columns)
+                             if 'industry' in col.lower() and i != subsector_col),
+                            None
+                        )
+                    
+                    # Positional fallbacks, but never onto unrelated or empty columns
+                    used_cols = {ticker_col, company_col, sector_col, subsector_col}
+                    if sector_col is None and len(columns) > 2 and 2 not in used_cols \
+                            and _has_values(table.iloc[:, 2]):
+                        sector_col = 2
+                        used_cols.add(2)
+                    if subsector_col is None and len(columns) > 3 and 3 not in used_cols \
+                            and _has_values(table.iloc[:, 3]):
+                        subsector_col = 3
+                    
                     # Table found, standardize column names
-                    df = table.copy()
+                    df = pd.DataFrame({
+                        'Ticker': table.iloc[:, ticker_col],
+                        'Company': table.iloc[:, company_col],
+                        'GICS_Sector': table.iloc[:, sector_col] if sector_col is not None else '',
+                        'GICS_Sub_Industry': table.iloc[:, subsector_col] if subsector_col is not None else '',
+                    })
                     
-                    # Safe fallback for sector column
-                    sector_fallback = None
-                    if sector_col is None and len(columns) > 2:
-                        sector_fallback = columns[2]
+                    # With only one classification column, use it for both fields
+                    if sector_col is None and subsector_col is not None:
+                        df['GICS_Sector'] = df['GICS_Sub_Industry']
+                    elif subsector_col is None and sector_col is not None:
+                        df['GICS_Sub_Industry'] = df['GICS_Sector']
                     
-                    # Safe fallback for subsector column  
-                    subsector_fallback = None
-                    if subsector_col is None and len(columns) > 3:
-                        subsector_fallback = columns[3]
-                    
-                    rename_dict = {
-                        columns[ticker_col]: 'Ticker',
-                        columns[company_col]: 'Company'
-                    }
-                    
-                    # Add sector column if available
-                    if sector_col is not None:
-                        rename_dict[columns[sector_col]] = 'GICS_Sector'
-                    elif sector_fallback is not None:
-                        rename_dict[sector_fallback] = 'GICS_Sector'
-                    
-                    # Add subsector column if available
-                    if subsector_col is not None:
-                        rename_dict[columns[subsector_col]] = 'GICS_Sub_Industry'
-                    elif subsector_fallback is not None:
-                        rename_dict[subsector_fallback] = 'GICS_Sub_Industry'
-                    
-                    df = df.rename(columns=rename_dict)
-                    
-                    # Keep only the desired columns that exist
-                    available_columns = ['Ticker', 'Company']
-                    if 'GICS_Sector' in df.columns:
-                        available_columns.append('GICS_Sector')
-                    else:
-                        df['GICS_Sector'] = ''  # Add empty column if missing
-                        available_columns.append('GICS_Sector')
-                    
-                    if 'GICS_Sub_Industry' in df.columns:
-                        available_columns.append('GICS_Sub_Industry')
-                    else:
-                        df['GICS_Sub_Industry'] = ''  # Add empty column if missing
-                        available_columns.append('GICS_Sub_Industry')
-                    
+                    available_columns = ['Ticker', 'Company', 'GICS_Sector', 'GICS_Sub_Industry']
                     df = df[available_columns]
                     
                     # Clean data
@@ -145,6 +248,28 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
         logger.error(f"Error with pandas.read_html(): {e}")
         return None
 
+def _fetch_html(url: str) -> str:
+    """
+    Fetch the raw HTML of a Wikipedia page.
+    
+    Args:
+        url: Wikipedia URL
+        
+    Returns:
+        Page HTML as text
+        
+    Raises:
+        requests.RequestException: If the page cannot be fetched
+    """
+    headers = {
+        'User-Agent': USER_AGENT
+    }
+    
+    response = requests.get(url, headers=headers, timeout=HTTP_REQUEST_TIMEOUT)
+    response.raise_for_status()
+    
+    return response.text
+
 def _fetch_page_content(url: str) -> BeautifulSoup:
     """
     Fetch and parse the Wikipedia page content.
@@ -158,14 +283,7 @@ def _fetch_page_content(url: str) -> BeautifulSoup:
     Raises:
         Exception: If page cannot be fetched or parsed
     """
-    headers = {
-        'User-Agent': USER_AGENT.random
-    }
-    
-    response = requests.get(url, headers=headers, timeout=HTTP_REQUEST_TIMEOUT)
-    response.raise_for_status()
-    
-    return BeautifulSoup(response.content, 'html.parser')
+    return BeautifulSoup(_fetch_html(url), 'html.parser')
 
 def _locate_components_table(soup: BeautifulSoup) -> Optional[object]:
     """
@@ -327,7 +445,17 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
         # Locate the components table
         table = _locate_components_table(soup)
         if not table:
-            logger.error("No suitable table found with BeautifulSoup")
+            title = soup.title.get_text(strip=True) if soup.title else 'n/a'
+            wikitables = soup.find_all('table', class_='wikitable')
+            logger.error(
+                f"No suitable table found with BeautifulSoup "
+                f"(page title: {title!r}, wikitables on page: {len(wikitables)})"
+            )
+            for i, wikitable in enumerate(wikitables, 1):
+                first_row = wikitable.find('tr')
+                headers = [c.get_text(strip=True) for c in first_row.find_all(['th', 'td'])] if first_row else []
+                rows = len(wikitable.find_all('tr'))
+                logger.info(f"  wikitable {i}: {rows} rows, headers {headers}")
             return None
         
         # Parse header row and determine column indices
@@ -352,6 +480,18 @@ def get_nasdaq100_with_beautifulsoup(url: str) -> Optional[pd.DataFrame]:
     except Exception as e:
         logger.error(f"Error with BeautifulSoup method: {e}")
         return None
+
+def _has_values(column: pd.Series) -> bool:
+    """
+    Check whether a table column contains any non-empty values.
+    
+    Args:
+        column: Table column
+        
+    Returns:
+        True if at least one cell has text
+    """
+    return column.dropna().astype(str).str.strip().ne('').any()
 
 def find_column_by_keywords(columns: List[str], keywords: List[str]) -> Optional[int]:
     """
@@ -531,3 +671,5 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Main program failed: {e}")
         print(f"Error: {e}")
+        # Non-zero exit code so that CI marks the run as failed
+        sys.exit(1)
