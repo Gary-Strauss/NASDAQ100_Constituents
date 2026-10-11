@@ -372,6 +372,12 @@
     "GICS_Sub_Industry":"Software"
   },
   {
+    "Ticker":"MRNA",
+    "Company":"Moderna",
+    "GICS_Sector":"Biotechnology",
+    "GICS_Sub_Industry":"Biotechnology"
+  },
+  {
     "Ticker":"MDLZ",
     "Company":"Mondelez International",
     "GICS_Sector":"Packaged Foods",
@@ -580,12 +586,6 @@
     "Company":"Walmart",
     "GICS_Sector":"Department\/Specialty Retail Stores",
     "GICS_Sub_Industry":"Department\/Specialty Retail Stores"
-  },
-  {
-    "Ticker":"WBD",
-    "Company":"Warner Bros. Discovery",
-    "GICS_Sector":"Entertainment",
-    "GICS_Sub_Industry":"Entertainment"
   },
   {
     "Ticker":"WDC",
