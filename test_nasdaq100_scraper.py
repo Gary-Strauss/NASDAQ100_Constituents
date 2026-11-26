@@ -9,6 +9,7 @@ import requests
 from nasdaq100_scraper import (
     clean_text,
     find_column_by_keywords,
+    find_classification_columns,
     clean_dataframe,
     validate_dataframe,
     _fetch_page_content,
@@ -709,6 +710,61 @@ class TestGetNasdaq100WithPandasColumns:
 
         assert (df['GICS_Sector'] == 'Biotechnology').all()
         assert (df['GICS_Sub_Industry'] == 'Biotechnology').all()
+
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_icb_subsector_and_industry_columns(self, mock_fetch):
+        """A "Subsector" header is not mistaken for the sector column."""
+        mock_fetch.return_value = _components_html(
+            ['Company', 'Ticker', 'ICB Subsector', 'ICB Industry'],
+            lambda t, i: [f'Company {i}', t, 'Software', 'Technology'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Technology').all()
+        assert (df['GICS_Sub_Industry'] == 'Software').all()
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_industry_then_subsector_columns(self, mock_fetch):
+        """Industry and Subsector columns map to sector and sub-industry."""
+        mock_fetch.return_value = _components_html(
+            ['Ticker', 'Company', 'Industry', 'Subsector'],
+            lambda t, i: [t, f'Company {i}', 'Health Care', 'Biotechnology'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Health Care').all()
+        assert (df['GICS_Sub_Industry'] == 'Biotechnology').all()
+
+
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_live_wikipedia_layout(self, mock_fetch):
+        """Header layout of List_of_NASDAQ-100_companies as of 2026-11."""
+        mock_fetch.return_value = _components_html(
+            ['Ticker', 'Company', 'ISIN', 'ICB Industry[2]', 'ICB Subsector[2]'],
+            lambda t, i: [t, f'Company {i}', 'US0000000000', 'Technology', 'Software'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Technology').all()
+        assert (df['GICS_Sub_Industry'] == 'Software').all()
+
+class TestFindClassificationColumns:
+    """Test find_classification_columns."""
+
+    def test_gics(self):
+        assert find_classification_columns(['Ticker', 'Company', 'GICS Sector', 'GICS Sub-Industry']) == (2, 3)
+
+    def test_subsector_before_industry(self):
+        assert find_classification_columns(['Company', 'Ticker', 'Subsector', 'Industry']) == (None, 2)
+
+    def test_parse_header_row_subsector(self):
+        html = """
+        <table><tr><th>Company</th><th>Ticker</th><th>ICB Subsector</th><th>ICB Industry</th></tr></table>
+        """
+        table = BeautifulSoup(html, 'html.parser').find('table')
+        _, ticker_idx, company_idx, sector_idx, subsector_idx = _parse_header_row(table)
+        assert (ticker_idx, company_idx, sector_idx, subsector_idx) == (1, 0, 3, 2)
 
 
 if __name__ == "__main__":
