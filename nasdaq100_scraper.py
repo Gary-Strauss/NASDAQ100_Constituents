@@ -193,8 +193,7 @@ def get_nasdaq100_with_pandas(url: str) -> Optional[pd.DataFrame]:
                 # Flexible column detection
                 ticker_col = find_column_by_keywords(columns, ['ticker', 'symbol'])
                 company_col = find_column_by_keywords(columns, ['company', 'name'])
-                sector_col = find_column_by_keywords(columns, ['sector', 'gics sector'])
-                subsector_col = find_column_by_keywords(columns, ['sub-industry', 'gics sub', 'sub industry'])
+                sector_col, subsector_col = find_classification_columns(columns)
                 
                 if ticker_col is not None and company_col is not None:
                     logger.info(f"Components table columns: {columns}")
@@ -354,8 +353,14 @@ def _parse_header_row(table: object) -> tuple:
     
     ticker_idx = find_column_by_keywords(header_texts, ['ticker', 'symbol'])
     company_idx = find_column_by_keywords(header_texts, ['company', 'name'])
-    sector_idx = find_column_by_keywords(header_texts, ['sector', 'gics sector'])
-    subsector_idx = find_column_by_keywords(header_texts, ['sub-industry', 'gics sub', 'sub industry'])
+    sector_idx, subsector_idx = find_classification_columns(header_texts)
+    if sector_idx is None:
+        # A plain "Industry" column serves as sector if no sector column exists
+        sector_idx = next(
+            (i for i, text in enumerate(header_texts)
+             if 'industry' in text.lower() and i != subsector_idx),
+            None
+        )
     
     # Fallback indices if not found
     if ticker_idx is None: ticker_idx = 0
@@ -492,6 +497,33 @@ def _has_values(column: pd.Series) -> bool:
         True if at least one cell has text
     """
     return column.dropna().astype(str).str.strip().ne('').any()
+
+SUB_CLASSIFICATION_KEYWORDS = ['sub-industry', 'sub industry', 'subindustry',
+                               'subsector', 'sub-sector', 'sub sector', 'gics sub']
+
+def find_classification_columns(columns: List[str]) -> tuple:
+    """
+    Find the sector and sub-industry column indices.
+    
+    Headers such as "ICB Subsector" contain the word "sector", so sub-level
+    columns are identified first and excluded from the sector search.
+    
+    Args:
+        columns: List of column names
+        
+    Returns:
+        Tuple of (sector_idx, subsector_idx), each None if not found
+    """
+    subsector_idx = find_column_by_keywords(columns, SUB_CLASSIFICATION_KEYWORDS)
+    sector_idx = None
+    for i, col in enumerate(columns):
+        col_lower = str(col).lower().strip()
+        if i == subsector_idx or any(k in col_lower for k in SUB_CLASSIFICATION_KEYWORDS):
+            continue
+        if 'sector' in col_lower:
+            sector_idx = i
+            break
+    return sector_idx, subsector_idx
 
 def find_column_by_keywords(columns: List[str], keywords: List[str]) -> Optional[int]:
     """
