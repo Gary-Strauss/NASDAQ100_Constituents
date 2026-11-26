@@ -737,6 +737,18 @@ class TestGetNasdaq100WithPandasColumns:
         assert (df['GICS_Sub_Industry'] == 'Biotechnology').all()
 
 
+    @patch('nasdaq100_scraper._fetch_html')
+    def test_live_wikipedia_layout(self, mock_fetch):
+        """Header layout of List_of_NASDAQ-100_companies as of 2026-11."""
+        mock_fetch.return_value = _components_html(
+            ['Ticker', 'Company', 'ISIN', 'ICB Industry[2]', 'ICB Subsector[2]'],
+            lambda t, i: [t, f'Company {i}', 'US0000000000', 'Technology', 'Software'])
+
+        df = get_nasdaq100_with_pandas('https://test.com')
+
+        assert (df['GICS_Sector'] == 'Technology').all()
+        assert (df['GICS_Sub_Industry'] == 'Software').all()
+
 class TestFindClassificationColumns:
     """Test find_classification_columns."""
 
